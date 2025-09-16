@@ -1,0 +1,3214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Music Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    /* Base Styles & Variables */
+:root {
+    --primary-color: #6a11cb;
+    --primary-light: #8b5cf6;
+    --primary-dark: #4c1d95;
+    --secondary-color: #2575fc;
+    --secondary-light: #60a5fa;
+    --secondary-dark: #1d4ed8;
+    --dark-color: #1a1a2e;
+    --light-color: #f5f5f5;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --text-color: #333333;
+    --text-light: #f5f5f5;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    --dark-gradient: linear-gradient(135deg, #111827, #1f2937);
+    --primary-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 70px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: inherit;
+}
+
+h1, h2, h3, h4 {
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* Preloader */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-color);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.loader i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-light);
+}
+
+/* Navbar Styles */
+.navbar {
+    background: var(--dark-gradient);
+    color: var(--text-light);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--box-shadow);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo i {
+    font-size: 1.5rem;
+    color: var(--primary-light);
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link i {
+    font-size: 1.1rem;
+    color: var(--primary-light);
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 3px 0;
+    transition: var(--transition);
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: calc(100vh - 70px);
+    background: var(--dark-gradient);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 1rem;
+}
+
+.hero-content {
+    text-align: center;
+    max-width: 900px;
+    z-index: 10;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.glitch-text {
+    position: relative;
+    color: white;
+    text-shadow: 0 0 10px rgba(106, 17, 203, 0.8);
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--secondary-color);
+    animation: glitch 2s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+    left: -2px;
+    text-shadow: 2px 0 var(--primary-color);
+    animation: glitch 3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch {
+    0% {
+        clip-path: inset(40% 0 61% 0);
+    }
+    20% {
+        clip-path: inset(92% 0 1% 0);
+    }
+    40% {
+        clip-path: inset(43% 0 1% 0);
+    }
+    60% {
+        clip-path: inset(25% 0 58% 0);
+    }
+    80% {
+        clip-path: inset(54% 0 7% 0);
+    }
+    100% {
+        clip-path: inset(58% 0 43% 0);
+    }
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 15px rgba(106, 17, 203, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(106, 17, 203, 0.6);
+}
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.btn-info {
+    background-color: var(--info-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-info:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+.featured-instruments {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.instrument-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.instrument-icon i {
+    font-size: 2.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.instrument-icon:hover {
+    transform: translateY(-5px);
+}
+
+.audio-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.wave {
+    width: 5px;
+    height: 100px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    margin: 0 15px;
+    animation: wave 1s infinite ease-in-out alternate;
+    border-radius: 20px;
+}
+
+.wave:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.wave:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.wave:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.wave:nth-child(5) {
+    animation-delay: 0.4s;
+}
+
+@keyframes wave {
+    0% {
+        height: 20px;
+    }
+    100% {
+        height: 100px;
+    }
+}
+
+/* Section Styles */
+.section {
+    padding: 4rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--dark-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-header h2 i {
+    color: var(--primary-color);
+}
+
+.section-header p {
+    color: #666;
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.section-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+/* Drum Kit Styles */
+.drum-set-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+}
+
+.drum-set {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.drum-element {
+    position: absolute;
+    cursor: pointer;
+    transition: var(--transition);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.drum-element:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
+}
+
+.drum-element.active {
+    transform: scale(0.95);
+}
+
+.crash {
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #f0f0f0, #d0d0d0);
+    border-radius: 50%;
+    top: 50px;
+    left: 100px;
+}
+
+.crash2 {
+    width: 130px;
+    height: 130px;
+    background: radial-gradient(circle, #f0f0f0, #d0d0d0);
+    border-radius: 50%;
+    top: 40px;
+    right: 100px;
+}
+
+.hihat-top {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #f0f0f0, #d0d0d0);
+    border-radius: 50%;
+    top: 150px;
+    left: 50px;
+}
+
+.hihat-closed {
+    width: 90px;
+    height: 90px;
+    background: radial-gradient(circle, #f0f0f0, #d0d0d0);
+    border-radius: 50%;
+    top: 160px;
+    left: 200px;
+}
+
+.snare {
+    width: 120px;
+    height: 70px;
+    background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+    border-radius: 10px;
+    top: 250px;
+    left: 150px;
+}
+
+.tom1 {
+    width: 100px;
+    height: 80px;
+    background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+    border-radius: 10px;
+    top: 200px;
+    left: 300px;
+}
+
+.tom2 {
+    width: 110px;
+    height: 90px;
+    background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+    border-radius: 10px;
+    top: 220px;
+    left: 450px;
+}
+
+.floor-tom {
+    width: 130px;
+    height: 100px;
+    background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+    border-radius: 10px;
+    top: 350px;
+    right: 100px;
+}
+
+.kick {
+    width: 180px;
+    height: 180px;
+    background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+    border-radius: 50%;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ride {
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, #f0f0f0, #d0d0d0);
+    border-radius: 50%;
+    top: 120px;
+    right: 50px;
+}
+
+.key-hint {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    z-index: 5;
+}
+
+.drum-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.status-display {
+    background-color: #f0f0f0;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
+}
+
+.record-btn {
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.record-btn:hover:not(:disabled) {
+    background-color: #e5e5e5;
+}
+
+.record-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#record-drums, #record-piano, #record-guitar, #record-talking-drum {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+#stop-record-drums, #stop-record-piano, #stop-record-guitar, #stop-record-talking-drum {
+    background-color: var(--dark-color);
+    color: white;
+}
+
+#play-record-drums, #play-record-piano, #play-record-guitar, #play-record-talking-drum {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#metronome-drums {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.tempo-control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+}
+
+/* Piano Styles */
+.piano-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+}
+
+.piano-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 1rem;
+    background-color: #333;
+    border-radius: var(--border-radius);
+}
+
+.piano {
+    display: flex;
+    position: relative;
+    height: 300px;
+    min-width: 1000px;
+    margin: 0 auto;
+}
+
+.key {
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 20px;
+}
+
+.key span {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.white {
+    width: 50px;
+    height: 100%;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 0 0 5px 5px;
+    color: #333;
+    z-index: 1;
+}
+
+.black {
+    position: absolute;
+    width: 30px;
+    height: 60%;
+    background-color: black;
+    border-radius: 0 0 5px 5px;
+    z-index: 2;
+    color: white;
+}
+
+.key:nth-child(2) { left: 35px; }
+.key:nth-child(4) { left: 85px; }
+.key:nth-child(7) { left: 185px; }
+.key:nth-child(9) { left: 235px; }
+.key:nth-child(11) { left: 285px; }
+.key:nth-child(14) { left: 385px; }
+.key:nth-child(16) { left: 435px; }
+.key:nth-child(19) { left: 535px; }
+
+.key.active {
+    background: linear-gradient(to bottom, var(--primary-color), var(--primary-light));
+    color: white;
+}
+
+.piano-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sound-selector {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.sound-selector select {
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #ddd;
+    background-color: white;
+    min-width: 150px;
+}
+
+/* Guitar Styles */
+.guitar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+}
+
+.guitar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.guitar-neck {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(to right, #8B4513, #A0522D);
+    border-radius: 5px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 1rem 0;
+}
+
+.guitar-strings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.string {
+    width: 100%;
+    height: 2px;
+    background-color: #d0d0d0;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.string:hover {
+    height: 3px;
+    background-color: #f0f0f0;
+}
+
+.string.playing {
+    height: 4px;
+    background-color: white;
+}
+
+.string-label {
+    position: absolute;
+    left: -20px;
+    top: -10px;
+    color: white;
+    font-weight: 500;
+}
+
+.frets {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.fret {
+    width: 2px;
+    height: 100%;
+    background-color: #d0d0d0;
+}
+
+.guitar-body {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border-radius: 150px 150px 50px 50px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.guitar-hole {
+    width: 100px;
+    height: 100px;
+    background-color: #1a1a2e;
+    border-radius: 50%;
+}
+
+.guitar-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chord-display {
+    margin-top: 2rem;
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+.chord-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.chord-btn {
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.chord-btn:hover {
+    background-color: var(--primary-light);
+    color: white;
+}
+
+/* Talking Drums Styles */
+.talking-drums-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+}
+
+.talking-drums-set {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.talking-drum-large,
+.talking-drum-medium,
+.talking-drum-small {
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.talking-drum-large {
+    width: 180px;
+    height: 300px;
+}
+
+.talking-drum-medium {
+    width: 150px;
+    height: 250px;
+}
+
+.talking-drum-small {
+    width: 120px;
+    height: 200px;
+}
+
+.talking-drum-large .drum-body,
+.talking-drum-medium .drum-body,
+.talking-drum-small .drum-body {
+    width: 100%;
+    height: 70%;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border-radius: 20px;
+    position: absolute;
+    top: 15%;
+    left: 0;
+}
+
+.talking-drum-large .drum-top,
+.talking-drum-large .drum-bottom,
+.talking-drum-medium .drum-top,
+.talking-drum-medium .drum-bottom,
+.talking-drum-small .drum-top,
+.talking-drum-small .drum-bottom {
+    width: 100%;
+    height: 15%;
+    background-color: #D2B48C;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.drum-top {
+    top: 0;
+}
+
+.drum-bottom {
+    bottom: 0;
+}
+
+.talking-drum-large:hover,
+.talking-drum-medium:hover,
+.talking-drum-small:hover {
+    transform: scale(1.05);
+}
+
+.talking-drum-large:active,
+.talking-drum-medium:active,
+.talking-drum-small:active {
+    transform: scale(0.95);
+}
+
+.talking-drums-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.rhythm-patterns {
+    margin-top: 2rem;
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+.rhythm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.rhythm-btn {
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.rhythm-btn:hover {
+    background-color: var(--primary-light);
+    color: white;
+}
+
+/* Tutorial Styles */
+.tutorial-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--border-radius);
+    background-color: #f0f0f0;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.tab-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.tutorial-grid {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.tutorial-grid.active {
+    display: grid;
+}
+
+.tutorial-card {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    background-color: white;
+    cursor: pointer;
+}
+
+.tutorial-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.tutorial-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.tutorial-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.tutorial-card:hover .tutorial-image img {
+    transform: scale(1.05);
+}
+
+.play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.tutorial-card:hover .play-icon {
+    opacity: 1;
+}
+
+.level {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.beginner {
+    background-color: #e6f7ff;
+    color: #0070f3;
+}
+
+.intermediate {
+    background-color: #fff7e6;
+    color: #fa8c16;
+}
+
+.advanced {
+    background-color: #fff1f0;
+    color: #f5222d;
+}
+
+.tutorial-info {
+    padding: 1.5rem;
+}
+
+.tutorial-info h3 {
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.tutorial-info p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.duration {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* Recordings Section */
+.recordings-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    min-height: 300px;
+    box-shadow: var(--box-shadow);
+}
+
+.no-recordings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    height: 200px;
+    color: #888;
+}
+
+.no-recordings i {
+    font-size: 3rem;
+    color: #ddd;
+}
+
+.recordings-list {
+    display: none;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1100;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    max-width: 800px;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0;
+}
+
+/* Footer Styles */
+footer {
+    background: var(--dark-gradient);
+    color: var(--text-light);
+    padding: 4rem 0 1rem;
+    margin-top: auto;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-logo i {
+    font-size: 2rem;
+    color: var(--primary-light);
+}
+
+.footer-links h3,
+.footer-newsletter h3,
+.footer-social h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.footer-links h3::after,
+.footer-newsletter h3::after,
+.footer-social h3::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: var(--primary-gradient);
+}
+
+.footer-links ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.footer-links a {
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--primary-light);
+    padding-left: 5px;
+}
+
+.footer-newsletter p {
+    margin-bottom: 1rem;
+}
+
+.footer-newsletter form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.footer-newsletter input {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.footer-newsletter button {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: var(--border-radius);
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-icons a {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.social-icons a:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 1400px;
+    margin: 3rem auto 0;
+    padding: 2rem 0 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .drum-set {
+        height: 400px;
+    }
+}
+
+@media (max-width: 992px) {
+    .nav-container {
+        padding: 0 1rem;
+    }
+    
+    .piano {
+        min-width: 700px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: var(--dark-color);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+        padding: 1rem 0;
+        z-index: 1000;
+    }
+    
+    .nav-menu.active {
+        left: 0;
+    }
+    
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+    
+    .piano {
+        height: 250px;
+    }
+    
+    .guitar-body {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .footer-newsletter form {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 576px) {
+    .section {
+        padding: 3rem 1rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .featured-instruments {
+        gap: 1rem;
+    }
+    
+    .drum-set {
+        height: 350px;
+    }
+    
+    .piano {
+        min-width: 500px;
+        height: 200px;
+    }
+    
+    .guitar-neck {
+        height: 150px;
+    }
+    
+    .guitar-body {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .tutorial-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-drum"></i>
+                <h1>Interactive Music Studio</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#drums" class="nav-link"><i class="fas fa-drum"></i> Drums</a></li>
+                <li><a href="#piano" class="nav-link"><i class="fas fa-music"></i> Piano</a></li>
+                <li><a href="#guitar" class="nav-link"><i class="fas fa-guitar"></i> Guitar</a></li>
+                <li><a href="#talking-drums" class="nav-link"><i class="fas fa-drum-steelpan"></i> Talking Drums</a></li>
+                <li><a href="#tutorials" class="nav-link"><i class="fas fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="#recordings" class="nav-link"><i class="fas fa-microphone"></i> My Recordings</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home/Landing Section -->
+        <section id="home" class="section hero-section">
+            <div class="hero-content">
+                <h1 class="glitch-text" data-text="Play. Create. Learn.">Play. Create. Learn.</h1>
+                <p class="subtitle">Discover your musical talent with our interactive instruments</p>
+                <div class="hero-buttons">
+                    <a href="#drums" class="btn btn-primary">Start Playing <i class="fas fa-play"></i></a>
+                    <a href="#tutorials" class="btn btn-secondary">Learn How <i class="fas fa-graduation-cap"></i></a>
+                </div>
+                <div class="featured-instruments">
+                    <div class="instrument-icon">
+                        <i class="fas fa-drum"></i>
+                        <span>Drums</span>
+                    </div>
+                    <div class="instrument-icon">
+                        <i class="fas fa-music"></i>
+                        <span>Piano</span>
+                    </div>
+                    <div class="instrument-icon">
+                        <i class="fas fa-guitar"></i>
+                        <span>Guitar</span>
+                    </div>
+                    <div class="instrument-icon">
+                        <i class="fas fa-drum-steelpan"></i>
+                        <span>Talking Drums</span>
+                    </div>
+                </div>
+            </div>
+            <div class="audio-wave">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+        </section>
+
+        <!-- Drum Set Section -->
+        <section id="drums" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-drum"></i> Interactive Drum Kit</h2>
+                <p>Play, record, and master the drums!</p>
+            </div>
+
+            <div class="drum-set-container">
+                <div class="drum-set">
+                    <div class="drum-element crash" data-key="49" data-note="crash1">
+                        <span class="key-hint">1</span>
+                    </div>
+                    <div class="drum-element crash2" data-key="50" data-note="crash2">
+                        <span class="key-hint">2</span>
+                    </div>
+                    <div class="drum-element hihat-top" data-key="51" data-note="hihat-open">
+                        <span class="key-hint">3</span>
+                    </div>
+                    <div class="drum-element hihat-closed" data-key="52" data-note="hihat-closed">
+                        <span class="key-hint">4</span>
+                    </div>
+                    <div class="drum-element snare" data-key="81" data-note="snare">
+                        <span class="key-hint">Q</span>
+                    </div>
+                    <div class="drum-element tom1" data-key="87" data-note="tom1">
+                        <span class="key-hint">W</span>
+                    </div>
+                    <div class="drum-element tom2" data-key="69" data-note="tom2">
+                        <span class="key-hint">E</span>
+                    </div>
+                    <div class="drum-element floor-tom" data-key="82" data-note="floor-tom">
+                        <span class="key-hint">R</span>
+                    </div>
+                    <div class="drum-element kick" data-key="32" data-note="kick">
+                        <span class="key-hint">Space</span>
+                    </div>
+                    <div class="drum-element ride" data-key="84" data-note="ride">
+                        <span class="key-hint">T</span>
+                    </div>
+                </div>
+
+                <div class="drum-controls">
+                    <div class="status-display" id="drum-status">Click on drums or use keyboard</div>
+                    <div class="control-panel">
+                        <button id="record-drums" class="record-btn">
+                            <i class="fas fa-circle"></i> Record
+                        </button>
+                        <button id="stop-record-drums" class="record-btn" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button id="play-record-drums" class="record-btn" disabled>
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                        <button id="metronome-drums" class="record-btn">
+                            <i class="fas fa-clock"></i> Metronome
+                        </button>
+                        <div class="tempo-control">
+                            <label for="tempo">Tempo: <span id="tempo-value">120</span> BPM</label>
+                            <input type="range" id="tempo" min="40" max="240" value="120">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-drums" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="reset-drums" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button id="drum-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+            </div>
+        </section>
+
+        <!-- Piano Section -->
+        <section id="piano" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-music"></i> Grand Piano</h2>
+                <p>Experience the beautiful sounds of a concert piano</p>
+            </div>
+
+            <div class="piano-container">
+                <div class="piano-wrapper">
+                    <div class="piano">
+                        <div class="key white" data-note="C3" data-key="65"><span>A</span></div>
+                        <div class="key black" data-note="C#3" data-key="87"><span>W</span></div>
+                        <div class="key white" data-note="D3" data-key="83"><span>S</span></div>
+                        <div class="key black" data-note="D#3" data-key="69"><span>E</span></div>
+                        <div class="key white" data-note="E3" data-key="68"><span>D</span></div>
+                        <div class="key white" data-note="F3" data-key="70"><span>F</span></div>
+                        <div class="key black" data-note="F#3" data-key="84"><span>T</span></div>
+                        <div class="key white" data-note="G3" data-key="71"><span>G</span></div>
+                        <div class="key black" data-note="G#3" data-key="89"><span>Y</span></div>
+                        <div class="key white" data-note="A3" data-key="72"><span>H</span></div>
+                        <div class="key black" data-note="A#3" data-key="85"><span>U</span></div>
+                        <div class="key white" data-note="B3" data-key="74"><span>J</span></div>
+                        <div class="key white" data-note="C4" data-key="75"><span>K</span></div>
+                        <div class="key black" data-note="C#4" data-key="79"><span>O</span></div>
+                        <div class="key white" data-note="D4" data-key="76"><span>L</span></div>
+                        <div class="key black" data-note="D#4" data-key="80"><span>P</span></div>
+                        <div class="key white" data-note="E4" data-key="186"><span>;</span></div>
+                        <div class="key white" data-note="F4" data-key="222"><span>'</span></div>
+                        <div class="key black" data-note="F#4" data-key="221"><span>]</span></div>
+                        <div class="key white" data-note="G4" data-key="220"><span>\</span></div>
+                    </div>
+                </div>
+
+                <div class="piano-controls">
+                    <div class="status-display" id="piano-status">Click keys or use keyboard to play</div>
+                    <div class="control-panel">
+                        <div class="sound-selector">
+                            <label for="piano-sound">Piano Type:</label>
+                            <select id="piano-sound">
+                                <option value="grand">Grand Piano</option>
+                                <option value="electric">Electric Piano</option>
+                                <option value="synth">Synth Piano</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="reverb">Reverb:</label>
+                            <input type="range" id="reverb" min="0" max="100" value="30">
+                        </div>
+                        <button id="record-piano" class="record-btn">
+                            <i class="fas fa-circle"></i> Record
+                        </button>
+                        <button id="stop-record-piano" class="record-btn" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button id="play-record-piano" class="record-btn" disabled>
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-piano" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="piano-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+                <button id="show-chords-btn" class="btn btn-secondary">
+                    <i class="fas fa-book"></i> Show Chord Chart
+                </button>
+            </div>
+        </section>
+
+        <!-- Guitar Section -->
+        <section id="guitar" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-guitar"></i> Interactive Guitar</h2>
+                <p>Strum and pick virtual guitar strings</p>
+            </div>
+
+            <div class="guitar-container">
+                <div class="guitar">
+                    <div class="guitar-neck">
+                        <div class="guitar-strings">
+                            <div class="string" data-string="1" data-note="E4"><span class="string-label">E</span></div>
+                            <div class="string" data-string="2" data-note="B3"><span class="string-label">B</span></div>
+                            <div class="string" data-string="3" data-note="G3"><span class="string-label">G</span></div>
+                            <div class="string" data-string="4" data-note="D3"><span class="string-label">D</span></div>
+                            <div class="string" data-string="5" data-note="A2"><span class="string-label">A</span></div>
+                            <div class="string" data-string="6" data-note="E2"><span class="string-label">E</span></div>
+                        </div>
+                        <div class="frets">
+                            <div class="fret" data-fret="0"></div>
+                            <div class="fret" data-fret="1"></div>
+                            <div class="fret" data-fret="2"></div>
+                            <div class="fret" data-fret="3"></div>
+                            <div class="fret" data-fret="4"></div>
+                        </div>
+                    </div>
+                    <div class="guitar-body">
+                        <div class="guitar-hole"></div>
+                    </div>
+                </div>
+
+                <div class="guitar-controls">
+                    <div class="status-display" id="guitar-status">Click strings or use keyboard (1-6) to play</div>
+                    <div class="control-panel">
+                        <div class="sound-selector">
+                            <label for="guitar-sound">Guitar Type:</label>
+                            <select id="guitar-sound">
+                                <option value="acoustic">Acoustic Guitar</option>
+                                <option value="electric">Electric Guitar</option>
+                                <option value="bass">Bass Guitar</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="guitar-distortion">Distortion:</label>
+                            <input type="range" id="guitar-distortion" min="0" max="100" value="0">
+                        </div>
+                        <button id="record-guitar" class="record-btn">
+                            <i class="fas fa-circle"></i> Record
+                        </button>
+                        <button id="stop-record-guitar" class="record-btn" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button id="play-record-guitar" class="record-btn" disabled>
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chord-display">
+                <h3>Common Chords</h3>
+                <div class="chord-buttons">
+                    <button class="chord-btn" data-chord="C">C</button>
+                    <button class="chord-btn" data-chord="G">G</button>
+                    <button class="chord-btn" data-chord="D">D</button>
+                    <button class="chord-btn" data-chord="A">A</button>
+                    <button class="chord-btn" data-chord="E">E</button>
+                    <button class="chord-btn" data-chord="Am">Am</button>
+                    <button class="chord-btn" data-chord="Em">Em</button>
+                    <button class="chord-btn" data-chord="F">F</button>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-guitar" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="guitar-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+            </div>
+        </section>
+
+        <!-- Talking Drums Section -->
+        <section id="talking-drums" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-drum-steelpan"></i> Talking Drums</h2>
+                <p>Experience the rhythmic tradition of African talking drums</p>
+            </div>
+
+            <div class="talking-drums-container">
+                <div class="talking-drums-set">
+                    <div class="talking-drum-large" id="talking-drum-large">
+                        <div class="drum-body"></div>
+                        <div class="drum-top"></div>
+                        <div class="drum-bottom"></div>
+                    </div>
+                    <div class="talking-drum-medium" id="talking-drum-medium">
+                        <div class="drum-body"></div>
+                        <div class="drum-top"></div>
+                        <div class="drum-bottom"></div>
+                    </div>
+                    <div class="talking-drum-small" id="talking-drum-small">
+                        <div class="drum-body"></div>
+                        <div class="drum-top"></div>
+                        <div class="drum-bottom"></div>
+                    </div>
+                </div>
+
+                <div class="talking-drums-controls">
+                    <div class="status-display" id="talking-drum-status">Click and drag on drums to play</div>
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label for="drum-resonance">Resonance:</label>
+                            <input type="range" id="drum-resonance" min="0" max="100" value="70">
+                        </div>
+                        <div class="control-group">
+                            <label for="drum-tone">Tone:</label>
+                            <input type="range" id="drum-tone" min="0" max="100" value="50">
+                        </div>
+                        <button id="record-talking-drum" class="record-btn">
+                            <i class="fas fa-circle"></i> Record
+                        </button>
+                        <button id="stop-record-talking-drum" class="record-btn" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button id="play-record-talking-drum" class="record-btn" disabled>
+                            <i class="fas fa-play"></i> Play
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rhythm-patterns">
+                <h3>Traditional Rhythm Patterns</h3>
+                <div class="rhythm-buttons">
+                    <button class="rhythm-btn" data-rhythm="dundun">Dundun</button>
+                    <button class="rhythm-btn" data-rhythm="highlife">Highlife</button>
+                    <button class="rhythm-btn" data-rhythm="jembe">Jembe</button>
+                    <button class="rhythm-btn" data-rhythm="fanga">Fanga</button>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-talking-drum" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="talking-drum-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+            </div>
+        </section>
+
+        <!-- Tutorials Section -->
+        <section id="tutorials" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-graduation-cap"></i> Learn Music</h2>
+                <p>Master the basics with our step-by-step tutorials</p>
+            </div>
+
+            <div class="tutorial-tabs">
+                <button class="tab-btn active" data-tab="all-tutorials">All</button>
+                <button class="tab-btn" data-tab="drums-tutorials">Drums</button>
+                <button class="tab-btn" data-tab="piano-tutorials">Piano</button>
+                <button class="tab-btn" data-tab="guitar-tutorials">Guitar</button>
+                <button class="tab-btn" data-tab="talking-drums-tutorials">Talking Drums</button>
+            </div>
+
+            <div class="tutorial-container">
+                <div class="tutorial-grid active" id="all-tutorials">
+                    <!-- All Tutorials -->
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/6a11cb/ffffff" alt="Drum Basics">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Drum Basics</h3>
+                            <p>Learn the fundamental techniques and beats</p>
+                            <span class="duration"><i class="far fa-clock"></i> 15 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/2575fc/ffffff" alt="Piano Fundamentals">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Piano Fundamentals</h3>
+                            <p>Master scales, chords and basic melodies</p>
+                            <span class="duration"><i class="far fa-clock"></i> 20 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/6a11cb/ffffff" alt="Guitar for Beginners">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Guitar for Beginners</h3>
+                            <p>Learn chords, strumming and finger picking</p>
+                            <span class="duration"><i class="far fa-clock"></i> 25 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/2575fc/ffffff" alt="Talking Drum Basics">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Talking Drum Basics</h3>
+                            <p>Learn the traditional techniques and sounds</p>
+                            <span class="duration"><i class="far fa-clock"></i> 18 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/6a11cb/ffffff" alt="Advanced Drum Fills">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level advanced">Advanced</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Advanced Drum Fills</h3>
+                            <p>Master complex fills and techniques</p>
+                            <span class="duration"><i class="far fa-clock"></i> 30 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/2575fc/ffffff" alt="Jazz Piano Techniques">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level intermediate">Intermediate</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Jazz Piano Techniques</h3>
+                            <p>Learn jazz chords, scales and improvisation</p>
+                            <span class="duration"><i class="far fa-clock"></i> 35 minutes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Individual instrument tutorial tabs will be populated with JavaScript -->
+                <div class="tutorial-grid" id="drums-tutorials"></div>
+                <div class="tutorial-grid" id="piano-tutorials"></div>
+                <div class="tutorial-grid" id="guitar-tutorials"></div>
+                <div class="tutorial-grid" id="talking-drums-tutorials"></div>
+            </div>
+        </section>
+
+        <!-- Recordings Section -->
+        <section id="recordings" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-microphone"></i> My Recordings</h2>
+                <p>Listen to, download, and share your musical creations</p>
+            </div>
+
+            <div class="recordings-container">
+                <div class="no-recordings" id="no-recordings">
+                    <i class="fas fa-music"></i>
+                    <p>You haven't created any recordings yet.</p>
+                    <p>Go to any instrument section and click "Record" to get started!</p>
+                </div>
+
+                <div class="recordings-list" id="recordings-list">
+                    <!-- Recordings will be dynamically added here -->
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="export-all" class="btn btn-primary">
+                    <i class="fas fa-file-export"></i> Export All Recordings
+                </button>
+                <button id="clear-recordings" class="btn btn-secondary">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-drum"></i>
+                <h2>Interactive Music Studio</h2>
+                <p>Discover the musician inside you</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#drums">Drums</a></li>
+                    <li><a href="#piano">Piano</a></li>
+                    <li><a href="#guitar">Guitar</a></li>
+                    <li><a href="#talking-drums">Talking Drums</a></li>
+                    <li><a href="#tutorials">Tutorials</a></li>
+                    <li><a href="#recordings">My Recordings</a></li>
+                </ul>
+            </div>
+            <div class="footer-newsletter">
+                <h3>Stay Updated</h3>
+                <p>Subscribe to our newsletter for the latest updates</p>
+                <form id="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+            <div class="footer-social">
+                <h3>Connect With Us</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-soundcloud"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Interactive Music Studio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Templates -->
+    <div class="modal" id="tutorial-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>How to Play</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be dynamically added -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="chord-chart-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Piano Chord Chart</h2>
+            </div>
+            <div class="modal-body">
+                <div class="chord-chart">
+                    <!-- Chord diagrams will be added dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <!-- Drum Kit Sounds -->
+    <audio id="crash1" src="https://assets.mixkit.co/sfx/preview/mixkit-crash-cymbal-drum-hit-554.mp3" preload="auto"></audio>
+    <audio id="crash2" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-crash-hit-558.mp3" preload="auto"></audio>
+    <audio id="hihat-open" src="https://assets.mixkit.co/sfx/preview/mixkit-hi-hat-hit-hard-562.mp3" preload="auto"></audio>
+    <audio id="hihat-closed" src="https://assets.mixkit.co  preload="auto"></audio>
+    <audio id="hihat-closed" src="https://assets.mixkit.co/sfx/preview/mixkit-hi-hat-short-hit-542.mp3" preload="auto"></audio>
+    <audio id="snare" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-hit-with-echo-549.mp3" preload="auto"></audio>
+    <audio id="tom1" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-tom-hit-2253.mp3" preload="auto"></audio>
+    <audio id="tom2" src="https://assets.mixkit.co/sfx/preview/mixkit-tribal-dry-drum-558.mp3" preload="auto"></audio>
+    <audio id="floor-tom" src="https://assets.mixkit.co/sfx/preview/mixkit-hand-tribal-drum-562.mp3" preload="auto"></audio>
+    <audio id="kick" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-bass-hit-2294.mp3" preload="auto"></audio>
+    <audio id="ride" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-and-percussion-545.mp3" preload="auto"></audio>
+    
+    <!-- Piano Sounds -->
+    <audio id="C3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-1-1318.mp3" preload="auto"></audio>
+    <audio id="C#3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-2-1319.mp3" preload="auto"></audio>
+    <audio id="D3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-3-1320.mp3" preload="auto"></audio>
+    <audio id="D#3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-4-1321.mp3" preload="auto"></audio>
+    <audio id="E3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-5-1322.mp3" preload="auto"></audio>
+    <audio id="F3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-6-1323.mp3" preload="auto"></audio>
+    <audio id="F#3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-7-1324.mp3" preload="auto"></audio>
+    <audio id="G3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-8-1325.mp3" preload="auto"></audio>
+    <audio id="G#3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-9-1326.mp3" preload="auto"></audio>
+    <audio id="A3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-10-1327.mp3" preload="auto"></audio>
+    <audio id="A#3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-11-1328.mp3" preload="auto"></audio>
+    <audio id="B3" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-12-1329.mp3" preload="auto"></audio>
+    <audio id="C4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-13-1330.mp3" preload="auto"></audio>
+    <audio id="C#4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-14-1331.mp3" preload="auto"></audio>
+    <audio id="D4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-15-1332.mp3" preload="auto"></audio>
+    <audio id="D#4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-16-1333.mp3" preload="auto"></audio>
+    <audio id="E4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-17-1334.mp3" preload="auto"></audio>
+    <audio id="F4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-18-1335.mp3" preload="auto"></audio>
+    <audio id="F#4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-19-1336.mp3" preload="auto"></audio>
+    <audio id="G4" src="https://assets.mixkit.co/sfx/preview/mixkit-piano-key-20-1337.mp3" preload="auto"></audio>
+    
+    <!-- Guitar Strings -->
+    <audio id="E4" src="https://assets.mixkit.co/sfx/preview/mixkit-guitar-string-tone-2326.mp3" preload="auto"></audio>
+    <audio id="B3" src="https://assets.mixkit.co/sfx/preview/mixkit-guitar-string-tone-2327.mp3" preload="auto"></audio>
+    <audio id="G3" src="https://assets.mixkit.co/sfx/preview/mixkit-guitar-string-tone-2328.mp3" preload="auto"></audio>
+    <audio id="D3" src="https://assets.mixkit.co/sfx/preview/mixkit-guitar-string-tone-2329.mp3" preload="auto"></audio>
+    <audio id="A2" src="https://assets.mixkit.co/sfx/preview/mixkit-guitar-string-tone-2330.mp3" preload="auto"></audio>
+    <audio id="E2" src="https://assets.mixkit.co/sfx/preview/mixkit-guitar-string-tone-2331.mp3" preload="auto"></audio>
+    
+    <!-- Talking Drum Sounds -->
+    <audio id="talking-drum-high" src="https://assets.mixkit.co/sfx/preview/mixkit-tribal-dry-drum-558.mp3" preload="auto"></audio>
+    <audio id="talking-drum-mid" src="https://assets.mixkit.co/sfx/preview/mixkit-hand-tribal-drum-562.mp3" preload="auto"></audio>
+    <audio id="talking-drum-low" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-and-percussion-545.mp3" preload="auto"></audio>
+    
+    <!-- Metronome Sound -->
+    <audio id="metronome-click" src="https://assets.mixkit.co/sfx/preview/mixkit-single-classic-click-765.mp3" preload="auto"></audio>
+
+    <script>    
+    document.addEventListener('DOMContentLoaded', function() {
+    // Initialize audio context - needed for browser autoplay policy
+    let audioContextInitialized = false;
+    
+    // Start audio button in header
+    document.getElementById('start-audio-btn').addEventListener('click', function() {
+        initializeAudioContext();
+        this.textContent = 'Audio Ready!';
+        this.disabled = true;
+        this.style.backgroundColor = '#28a745';
+    });
+    
+    function initializeAudioContext() {
+        if (!audioContextInitialized) {
+            // Create a temporary audio context to unlock audio
+            const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+            tempContext.resume().then(() => {
+                console.log('Audio context initialized');
+                audioContextInitialized = true;
+                
+                // Play a silent sound to unlock audio on iOS
+                const silentBuffer = tempContext.createBuffer(1, 1, 22050);
+                const source = tempContext.createBufferSource();
+                source.buffer = silentBuffer;
+                source.connect(tempContext.destination);
+                source.start(0);
+                
+                // Initialize all audio elements
+                preloadAudioElements();
+            });
+        }
+    }
+    
+    function preloadAudioElements() {
+        // Preload all audio elements
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.load();
+        });
+    }
+    
+    // Mobile Menu Toggle
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+    }
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (navMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+            
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 70,
+                    behavior: 'smooth'
+                });
+                
+                // Update active nav link
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                this.classList.add('active');
+            }
+        });
+    });
+    
+    // Audio Context
+    let audioContext;
+    let analyser;
+    let isPlaying = false;
+    let visualizerAnimationId;
+    
+    // Canvas for visualizer
+    const canvas = document.getElementById('visualizer');
+    const canvasCtx = canvas.getContext('2d');
+    
+    // Audio elements for each instrument
+    const drumsAudio = new Audio();
+    const guitarAudio = new Audio();
+    const keyboardAudio = new Audio();
+    
+    // Audio sources
+    const audioSources = {
+        drums: [
+            'https://assets.mixkit.co/sfx/preview/mixkit-tribal-dry-drum-558.mp3',
+            'https://assets.mixkit.co/sfx/preview/mixkit-hand-tribal-drum-562.mp3',
+            'https://assets.mixkit.co/sfx/preview/mixkit-drum-and-percussion-545.mp3'
+        ],
+        guitar: [
+            'https://assets.mixkit.co/sfx/preview/mixkit-guitar-stroke-up-and-down-2467.mp3',
+            'https://assets.mixkit.co/sfx/preview/mixkit-electric-guitar-distorted-slide-2340.mp3',
+            'https://assets.mixkit.co/sfx/preview/mixkit-sad-guitar-loop-2463.mp3'
+        ],
+        keyboard: [
+            'https://assets.mixkit.co/sfx/preview/mixkit-piano-falling-tone-395.mp3',
+            'https://assets.mixkit.co/sfx/preview/mixkit-futuristic-bass-hit-2303.mp3',
+            'https://assets.mixkit.co/sfx/preview/mixkit-church-organ-tone-2878.mp3'
+        ]
+    };
+    
+    // Current selections
+    let currentSelections = {
+        drums: 0,
+        guitar: 0,
+        keyboard: 0
+    };
+    
+    // Initialize audio sources
+    drumsAudio.src = audioSources.drums[0];
+    drumsAudio.loop = true;
+    
+    guitarAudio.src = audioSources.guitar[0];
+    guitarAudio.loop = true;
+    
+    keyboardAudio.src = audioSources.keyboard[0];
+    keyboardAudio.loop = true;
+    
+    // Test sound buttons
+    document.querySelectorAll('.test-sound-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const instrument = this.getAttribute('data-instrument');
+            playTestSound(instrument);
+        });
+    });
+    
+    function playTestSound(instrument) {
+        initializeAudioContext();
+        
+        const audio = instrument === 'drums' ? drumsAudio : 
+                     instrument === 'guitar' ? guitarAudio : keyboardAudio;
+        
+        // Play a short sample
+        const originalLoop = audio.loop;
+        audio.loop = false;
+        audio.currentTime = 0;
+        audio.play();
+        
+        // Restore loop setting after playing
+        setTimeout(() => {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.loop = originalLoop;
+        }, 2000);
+    }
+    
+    // Set up volume controls
+    document.getElementById('drums-volume')?.addEventListener('input', function() {
+        drumsAudio.volume = this.value / 100;
+    });
+    
+    document.getElementById('guitar-volume')?.addEventListener('input', function() {
+        guitarAudio.volume = this.value / 100;
+    });
+    
+    document.getElementById('keyboard-volume')?.addEventListener('input', function() {
+        keyboardAudio.volume = this.value / 100;
+    });
+    
+    document.getElementById('master-volume')?.addEventListener('input', function() {
+        const volume = this.value / 100;
+        drumsAudio.volume = (document.getElementById('drums-volume').value / 100) * volume;
+        guitarAudio.volume = (document.getElementById('guitar-volume').value / 100) * volume;
+        keyboardAudio.volume = (document.getElementById('keyboard-volume').value / 100) * volume;
+    });
+    
+    // Set up instrument toggles
+    document.getElementById('drums-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            drumsAudio.play();
+        } else {
+            drumsAudio.pause();
+        }
+    });
+    
+    document.getElementById('guitar-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            guitarAudio.play();
+        } else {
+            guitarAudio.pause();
+        }
+    });
+    
+    document.getElementById('keyboard-toggle')?.addEventListener('change', function() {
+        if (this.checked) {
+            keyboardAudio.play();
+        } else {
+            keyboardAudio.pause();
+        }
+    });
+    
+    // Set up rhythm selectors
+    const drumRhythmButtons = document.querySelectorAll('#talking-drums .rhythm-btn');
+    drumRhythmButtons.forEach((button, index) => {
+        button.addEventListener('click', function() {
+            setActiveButton(drumRhythmButtons, this);
+            currentSelections.drums = index;
+            drumsAudio.src = audioSources.drums[index];
+            if (isPlaying && document.getElementById('drums-toggle').checked) {
+                drumsAudio.play();
+            }
+        });
+    });
+    
+    const guitarRhythmButtons = document.querySelectorAll('#guitar .rhythm-btn');
+    guitarRhythmButtons.forEach((button, index) => {
+        button.addEventListener('click', function() {
+            setActiveButton(guitarRhythmButtons, this);
+            currentSelections.guitar = index;
+            guitarAudio.src = audioSources.guitar[index];
+            if (isPlaying && document.getElementById('guitar-toggle').checked) {
+                guitarAudio.play();
+            }
+        });
+    });
+    
+    const keyboardRhythmButtons = document.querySelectorAll('#keyboard .rhythm-btn');
+    keyboardRhythmButtons.forEach((button, index) => {
+        button.addEventListener('click', function() {
+            setActiveButton(keyboardRhythmButtons, this);
+            currentSelections.keyboard = index;
+            keyboardAudio.src = audioSources.keyboard[index];
+            if (isPlaying && document.getElementById('keyboard-toggle').checked) {
+                keyboardAudio.play();
+            }
+        });
+    });
+    
+    function setActiveButton(buttons, activeButton) {
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+        activeButton.classList.add('active');
+    }
+    
+    // Set up play/pause functionality
+    document.getElementById('main-play-btn')?.addEventListener('click', function() {
+        initializeAudioContext();
+        startAudioContext();
+        togglePlayback();
+    });
+    
+    document.getElementById('play-btn')?.addEventListener('click', function() {
+        initializeAudioContext();
+        startAudioContext();
+        togglePlayback();
+    });
+    
+    function togglePlayback() {
+        if (!isPlaying) {
+            // Start playback
+            if (document.getElementById('drums-toggle').checked) {
+                drumsAudio.play();
+            }
+            if (document.getElementById('guitar-toggle').checked) {
+                guitarAudio.play();
+            }
+            if (document.getElementById('keyboard-toggle').checked) {
+                keyboardAudio.play();
+            }
+            
+            document.getElementById('play-overlay').classList.add('hidden');
+            document.getElementById('play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+            
+            // Start visualizer
+            startVisualizer();
+        } else {
+            // Pause playback
+            drumsAudio.pause();
+            guitarAudio.pause();
+            keyboardAudio.pause();
+            
+            document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+            
+            // Stop visualizer
+            cancelAnimationFrame(visualizerAnimationId);
+        }
+        
+        isPlaying = !isPlaying;
+    }
+    
+    // Previous and Next buttons
+    document.getElementById('prev-btn')?.addEventListener('click', function() {
+        changeTrack('prev');
+    });
+    
+    document.getElementById('next-btn')?.addEventListener('click', function() {
+        changeTrack('next');
+    });
+    
+    function changeTrack(direction) {
+        // Change all tracks
+        ['drums', 'guitar', 'keyboard'].forEach(instrument => {
+            const maxIndex = audioSources[instrument].length - 1;
+            if (direction === 'prev') {
+                currentSelections[instrument] = currentSelections[instrument] === 0 ? maxIndex : currentSelections[instrument] - 1;
+            } else {
+                currentSelections[instrument] = currentSelections[instrument] === maxIndex ? 0 : currentSelections[instrument] + 1;
+            }
+            
+            // Update audio sources
+            const audio = instrument === 'drums' ? drumsAudio : 
+                         instrument === 'guitar' ? guitarAudio : keyboardAudio;
+            
+            audio.src = audioSources[instrument][currentSelections[instrument]];
+            
+            if (isPlaying && document.getElementById(`${instrument}-toggle`).checked) {
+                audio.play();
+            }
+            
+            // Update UI
+            const buttons = document.querySelectorAll(`#${instrument === 'drums' ? 'talking-drums' : instrument} .rhythm-btn`);
+            setActiveButton(buttons, buttons[currentSelections[instrument]]);
+        });
+    }
+    
+    // Initialize Audio Context and Visualizer
+    function startAudioContext() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            
+            try {
+                // Connect all audio sources to the analyser
+                const drumsSource = audioContext.createMediaElementSource(drumsAudio);
+                drumsSource.connect(analyser);
+                drumsSource.connect(audioContext.destination);
+                
+                const guitarSource = audioContext.createMediaElementSource(guitarAudio);
+                guitarSource.connect(analyser);
+                guitarSource.connect(audioContext.destination);
+                
+                const keyboardSource = audioContext.createMediaElementSource(keyboardAudio);
+                keyboardSource.connect(analyser);
+                keyboardSource.connect(audioContext.destination);
+                
+                // Set initial volumes
+                drumsAudio.volume = document.getElementById('drums-volume').value / 100;
+                guitarAudio.volume = document.getElementById('guitar-volume').value / 100;
+                keyboardAudio.volume = document.getElementById('keyboard-volume').value / 100;
+            } catch (e) {
+                console.error("Error connecting audio sources:", e);
+            }
+        }
+    }
+    
+    // Visualizer function
+    function startVisualizer() {
+        if (!analyser) return;
+        
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        
+        // Resize canvas
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        const WIDTH = canvas.width;
+        const HEIGHT = canvas.height;
+        
+        function drawVisualizer() {
+            visualizerAnimationId = requestAnimationFrame(drawVisualizer);
+            
+            analyser.getByteFrequencyData(dataArray);
+            
+            canvasCtx.fillStyle = 'rgb(26, 26, 46)';
+            canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+            
+            const barWidth = (WIDTH / bufferLength) * 2.5;
+            let barHeight;
+            let x = 0;
+            
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 2;
+                
+                const gradient = canvasCtx.createLinearGradient(0, HEIGHT, 0, HEIGHT - barHeight);
+                gradient.addColorStop(0, '#2575fc');
+                gradient.addColorStop(1, '#6a11cb');
+                
+                canvasCtx.fillStyle = gradient;
+                canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+                
+                x += barWidth + 1;
+            }
+        }
+        
+        drawVisualizer();
+    }
+    
+    // Export functionality
+    document.getElementById('export-btn')?.addEventListener('click', function() {
+        initializeAudioContext();
+        
+        if (!isPlaying) {
+            alert('Please start playback before exporting');
+            return;
+        }
+        
+        // In a real application, this would record and export the audio
+        alert('Your mix is being prepared for download. This would save your current instrument configuration as an audio file.');
+    });
+    
+    // Tab functionality for all tab sections
+    function setupTabs(tabBtns, tabContents) {
+        tabBtns.forEach(button => {
+            button.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                
+                // Update active button
+                tabBtns.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show active tab
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tab}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+    }
+    
+    // Set up all tab sections
+    const instrumentTabButtons = document.querySelectorAll('.instrument-tabs .tab-btn');
+    const instrumentTabs = document.querySelectorAll('.instrument-tab');
+    setupTabs(instrumentTabButtons, instrumentTabs);
+    
+    const tutorialTabButtons = document.querySelectorAll('.tutorial-tabs .tab-btn');
+    const tutorialTabs = document.querySelectorAll('.tutorial-tab');
+    setupTabs(tutorialTabButtons, tutorialTabs);
+    
+    const contentTabButtons = document.querySelectorAll('.content-tabs .tab-btn');
+    const contentTabs = document.querySelectorAll('.content-tab');
+    setupTabs(contentTabButtons, contentTabs);
+    
+    // Drum Kit Functionality
+    const drums = document.querySelectorAll('.drum');
+    const drumStatus = document.getElementById('drum-status');
+    const drumSounds = {
+        'kick': 'https://assets.mixkit.co/sfx/preview/mixkit-drum-bass-hit-2294.mp3',
+        'snare': 'https://assets.mixkit.co/sfx/preview/mixkit-drum-hit-with-echo-549.mp3',
+        'hihat': 'https://assets.mixkit.co/sfx/preview/mixkit-hi-hat-hard-hit-571.mp3',
+        'tom1': 'https://assets.mixkit.co/sfx/preview/mixkit-tribal-dry-drum-558.mp3',
+        'tom2': 'https://assets.mixkit.co/sfx/preview/mixkit-hand-tribal-drum-562.mp3',
+        'crash': 'https://assets.mixkit.co/sfx/preview/mixkit-crash-cymbal-drum-hit-554.mp3',
+        'ride': 'https://assets.mixkit.co/sfx/preview/mixkit-drum-and-percussion-545.mp3'
+    };
+    
+    // Ensure all drum audio elements are loaded
+    Object.keys(drumSounds).forEach(sound => {
+        const audioElement = document.getElementById(sound);
+        if (audioElement) {
+            audioElement.src = drumSounds[sound];
+            audioElement.load();
+        }
+    });
+    
+    function playDrum(key) {
+        const drum = document.querySelector(`.drum[data-key="${key}"]`);
+        if (!drum) return;
+        
+        const note = drum.getAttribute('data-note');
+        const audio = document.getElementById(note);
+        
+        if (!audio) return;
+        
+        // Update status
+        if (drumStatus) {
+            drumStatus.textContent = `Playing: ${note.charAt(0).toUpperCase() + note.slice(1)}`;
+        }
+        
+        audio.currentTime = 0;
+        audio.play();
+        
+        drum.classList.add('playing');
+        setTimeout(() => {
+            drum.classList.remove('playing');
+        }, 100);
+        
+        // Record the note if recording
+        if (isRecording && recordingInstrument === 'drums') {
+            recordNote('drums', note, 100);
+        }
+    }
+    
+    // Click events for drums
+    drums.forEach(drum => {
+        drum.addEventListener('click', function() {
+            initializeAudioContext();
+            
+            const note = this.getAttribute('data-note');
+            const audio = document.getElementById(note);
+            
+            if (!audio) return;
+            
+            // Update status
+            if (drumStatus) {
+                drumStatus.textContent = `Playing: ${note.charAt(0).toUpperCase() + note.slice(1)}`;
+            }
+            
+            audio.currentTime = 0;
+            audio.play();
+            
+            this.classList.add('playing');
+            setTimeout(() => {
+                this.classList.remove('playing');
+            }, 100);
+            
+            // Record the note if recording
+            if (isRecording && recordingInstrument === 'drums') {
+                recordNote('drums', note, 100);
+            }
+        });
+    });
+    
+    // Keyboard events for drums
+    window.addEventListener('keydown', function(e) {
+        if (e.repeat) return; // Prevent key repeat
+        
+        initializeAudioContext();
+        playDrum(e.keyCode);
+    });
+    
+    // Piano Functionality
+    const pianoKeys = document.querySelectorAll('.piano .key');
+    const pianoStatus = document.getElementById('piano-status');
+    const pianoSounds = {
+        'C3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-1-1318.mp3',
+        'C#3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-2-1319.mp3',
+        'D3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-3-1320.mp3',
+        'D#3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-4-1321.mp3',
+        'E3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-5-1322.mp3',
+        'F3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-6-1323.mp3',
+        'F#3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-7-1324.mp3',
+        'G3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-8-1325.mp3',
+        'G#3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-9-1326.mp3',
+        'A3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-10-1327.mp3',
+        'A#3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-11-1328.mp3',
+        'B3': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-12-1329.mp3',
+        'C4': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-13-1330.mp3',
+        'C#4': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-14-1331.mp3',
+        'D4': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-15-1332.mp3',
+        'D#4': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-16-1333.mp3',
+        'E4': 'https://assets.mixkit.co/sfx/preview/mixkit-piano-key-17-1334.mp3'
+    };
+    
+    // Ensure all piano audio elements are loaded
+    Object.keys(pianoSounds).forEach(note => {
+        const audioElement = document.getElementById(note);
+        if (audioElement) {
+            audioElement.src = pianoSounds[note];
+            audioElement.load();
+        }
+    });
+    
+    // Click events for piano
+    pianoKeys.forEach(key => {
+        key.addEventListener('mousedown', function() {
+            initializeAudioContext();
+            
+            const note = this.getAttribute('data-note');
+            const audio = document.getElementById(note);
+            
+            if (!audio) return;
+            
+            // Update status
+            if (pianoStatus) {
+                pianoStatus.textContent = `Playing: ${note}`;
+            }
+            
+            audio.currentTime = 0;
+            audio.play();
+            
+            this.classList.add('active');
+            
+            // Record the note if recording
+            if (isRecording && recordingInstrument === 'piano') {
+                recordNote('piano', note, 500);
+            }
+        });
+        
+        key.addEventListener('mouseup', function() {
+            this.classList.remove('active');
+        });
+        
+        key.addEventListener('mouseleave', function() {
+            this.classList.remove('active');
+        });
+        
+        // Touch events for mobile
+        key.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            
+            initializeAudioContext();
+            
+            const note = this.getAttribute('data-note');
+            const audio = document.getElementById(note);
+            
+            if (!audio) return;
+            
+            // Update status
+            if (pianoStatus) {
+                pianoStatus.textContent = `Playing: ${note}`;
+            }
+            
+            audio.currentTime = 0;
+            audio.play();
+            
+            this.classList.add('active');
+            
+            // Record the note if recording
+            if (isRecording && recordingInstrument === 'piano') {
+                recordNote('piano', note, 500);
+            }
+        });
+        
+        key.addEventListener('touchend', function() {
+            this.classList.remove('active');
+        });
+    });
+    
+    // Keyboard events for piano
+    window.addEventListener('keydown', function(e) {
+        if (e.repeat) return; // Prevent key repeat
+        
+        initializeAudioContext();
+        
+        const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+        if (!key) return;
+        
+        const note = key.getAttribute('data-note');
+        const audio = document.getElementById(note);
+        
+        if (!audio) return;
+        
+        // Update status
+        if (pianoStatus) {
+            pianoStatus.textContent = `Playing: ${note}`;
+        }
+        
+        audio.currentTime = 0;
+        audio.play();
+        
+        key.classList.add('active');
+        
+        // Record the note if recording
+        if (isRecording && recordingInstrument === 'piano') {
+            recordNote('piano', note, 500);
+        }
+    });
+    
+    window.addEventListener('keyup', function(e) {
+        const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+        if (key) {
+            key.classList.remove('active');
+        }
+    });
+    
+    // Talking Drum Functionality
+    const talkingDrum = document.getElementById('talking-drum-interactive');
+    const talkingDrumStatus = document.getElementById('talking-drum-status');
+    let isDrumming = false;
+    let drumContext;
+    let drumOscillator;
+    let drumGain;
+    
+    function initDrumContext() {
+        if (!drumContext) {
+            drumContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+    
+    function startDrumming(e) {
+        initializeAudioContext();
+        initDrumContext();
+        
+        isDrumming = true;
+        
+        // Create oscillator
+        drumOscillator = drumContext.createOscillator();
+        drumGain = drumContext.createGain();
+        
+        // Set initial frequency based on click position
+        const drumHeight = talkingDrum.offsetHeight;
+        const clickY = e.clientY - talkingDrum.getBoundingClientRect().top;
+        const normalizedY = 1 - (clickY / drumHeight);
+        const frequency = 100 + normalizedY * 300;
+        
+        // Update status
+        if (talkingDrumStatus) {
+            talkingDrumStatus.textContent = `Playing: ${Math.round(frequency)} Hz`;
+        }
+        
+        drumOscillator.type = 'triangle';
+        drumOscillator.frequency.value = frequency;
+        
+        // Apply resonance
+        const resonance = document.getElementById('drum-resonance').value / 100;
+        const tone = document.getElementById('drum-tone').value / 100;
+        
+        // Create filter for tone control
+        const filter = drumContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 500 + tone * 2000;
+        filter.Q.value = 5 + resonance * 15;
+        
+        // Connect nodes
+        drumOscillator.connect(filter);
+        filter.connect(drumGain);
+        drumGain.connect(drumContext.destination);
+        
+        // Start with attack
+        drumGain.gain.setValueAtTime(0, drumContext.currentTime);
+        drumGain.gain.linearRampToValueAtTime(0.8, drumContext.currentTime + 0.01);
+        
+        drumOscillator.start();
+        
+        // Visual feedback
+        talkingDrum.style.transform = 'scale(0.95)';
+        
+        // Record the note if recording
+        if (isRecording && recordingInstrument === 'talking-drum') {
+            recordNote('talking-drum', frequency.toString(), 200);
+        }
+    }
+    
+    function updateDrumming(e) {
+        if (!isDrumming || !drumOscillator) return;
+        
+        // Update frequency based on drag position
+        const drumHeight = talkingDrum.offsetHeight;
+        const dragY = e.clientY - talkingDrum.getBoundingClientRect().top;
+        const normalizedY = 1 - (dragY / drumHeight);
+        const frequency = 100 + normalizedY * 300;
+        
+        // Update status
+        if (talkingDrumStatus) {
+            talkingDrumStatus.textContent = `Playing: ${Math.round(frequency)} Hz`;
+        }
+        
+        drumOscillator.frequency.setValueAtTime(frequency, drumContext.currentTime);
+        
+        // Record the note if recording
+        if (isRecording && recordingInstrument === 'talking-drum') {
+            recordNote('talking-drum', frequency.toString(), 50);
+        }
+    }
+    
+    function stopDrumming() {
+        if (!isDrumming || !drumOscillator) return;
+        
+        // Release with decay
+        drumGain.gain.setValueAtTime(drumGain.gain.value, drumContext.currentTime);
+        drumGain.gain.exponentialRampToValueAtTime(0.001, drumContext.currentTime + 0.2);
+        
+        // Stop oscillator after decay
+        setTimeout(() => {
+            drumOscillator.stop();
+            drumOscillator = null;
+        }, 200);
+        
+        isDrumming = false;
+        
+        // Visual feedback
+        talkingDrum.style.transform = 'scale(1)';
+        
+        // Update status
+        if (talkingDrumStatus) {
+            talkingDrumStatus.textContent = 'Click and drag to play';
+        }
+    }
+    
+    // Set up talking drum events
+    if (talkingDrum) {
+        talkingDrum.addEventListener('mousedown', startDrumming);
+        talkingDrum.addEventListener('mousemove', updateDrumming);
+        talkingDrum.addEventListener('mouseup', stopDrumming);
+        talkingDrum.addEventListener('mouseleave', stopDrumming);
+        
+        // Touch events for mobile
+        talkingDrum.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            startDrumming(e.touches[0]);
+        });
+        
+        talkingDrum.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            updateDrumming(e.touches[0]);
+        });
+          {
+            e.preventDefault();
+            updateDrumming(e.touches[0]);
+        });
+        
+        talkingDrum.addEventListener('touchend', stopDrumming);
+        talkingDrum.addEventListener('touchcancel', stopDrumming);
+    }
+    
+    // Recording functionality
+    let isRecording = false;
+    let recordedNotes = [];
+    let recordStartTime = 0;
+    let recordingInstrument = '';
+    
+    // Set up recording buttons for each instrument
+    ['drums', 'piano', 'talking-drum'].forEach(instrument => {
+        const recordBtn = document.getElementById(`record-${instrument}`);
+        const stopRecordBtn = document.getElementById(`stop-record-${instrument}`);
+        const playRecordBtn = document.getElementById(`play-record-${instrument}`);
+        const saveBtn = document.getElementById(`save-${instrument}`);
+        
+        if (recordBtn && stopRecordBtn && playRecordBtn && saveBtn) {
+            recordBtn.addEventListener('click', function() {
+                initializeAudioContext();
+                startRecording(instrument);
+                recordBtn.disabled = true;
+                stopRecordBtn.disabled = false;
+                playRecordBtn.disabled = true;
+                saveBtn.disabled = true;
+            });
+            
+            stopRecordBtn.addEventListener('click', function() {
+                stopRecording();
+                recordBtn.disabled = false;
+                stopRecordBtn.disabled = true;
+                playRecordBtn.disabled = false;
+                saveBtn.disabled = false;
+            });
+            
+            playRecordBtn.addEventListener('click', function() {
+                playRecording(instrument);
+            });
+            
+            saveBtn.addEventListener('click', function() {
+                saveRecording(instrument);
+            });
+        }
+    });
+    
+    function startRecording(instrument) {
+        isRecording = true;
+        recordedNotes = [];
+        recordStartTime = Date.now();
+        recordingInstrument = instrument;
+        
+        // Update status
+        const statusElement = document.getElementById(`${instrument === 'talking-drum' ? 'talking-drum' : instrument}-status`);
+        if (statusElement) {
+            statusElement.textContent = 'Recording...';
+            statusElement.style.color = 'red';
+        }
+        
+        console.log(`Recording ${instrument} started. Play some notes!`);
+    }
+    
+    function recordNote(instrument, note, duration) {
+        if (!isRecording || instrument !== recordingInstrument) return;
+        
+        const time = Date.now() - recordStartTime;
+        recordedNotes.push({
+            instrument,
+            note,
+            time,
+            duration
+        });
+        
+        console.log(`Recorded: ${instrument} - ${note} at ${time}ms`);
+    }
+    
+    function stopRecording() {
+        isRecording = false;
+        
+        // Update status
+        const statusElement = document.getElementById(`${recordingInstrument === 'talking-drum' ? 'talking-drum' : recordingInstrument}-status`);
+        if (statusElement) {
+            statusElement.textContent = `Recorded: ${recordedNotes.length} notes`;
+            statusElement.style.color = 'green';
+        }
+        
+        console.log(`Recording stopped. ${recordedNotes.length} notes recorded.`);
+    }
+    
+    function playRecording(instrument) {
+        initializeAudioContext();
+        
+        if (recordedNotes.length === 0) {
+            alert('No recording to play');
+            return;
+        }
+        
+        // Update status
+        const statusElement = document.getElementById(`${instrument === 'talking-drum' ? 'talking-drum' : instrument}-status`);
+        if (statusElement) {
+            statusElement.textContent = 'Playing recording...';
+        }
+        
+        console.log(`Playing back ${recordedNotes.length} recorded notes...`);
+        
+        // Sort notes by time
+        const sortedNotes = [...recordedNotes].sort((a, b) => a.time - b.time);
+        
+        // Play each note at the correct time
+        sortedNotes.forEach(note => {
+            setTimeout(() => {
+                if (note.instrument === 'drums') {
+                    const audio = document.getElementById(note.note);
+                    if (audio) {
+                        audio.currentTime = 0;
+                        audio.play();
+                        
+                        // Highlight the drum
+                        const drum = document.querySelector(`.drum[data-note="${note.note}"]`);
+                        if (drum) {
+                            drum.classList.add('playing');
+                            setTimeout(() => {
+                                drum.classList.remove('playing');
+                            }, 100);
+                        }
+                    }
+                } else if (note.instrument === 'piano') {
+                    const audio = document.getElementById(note.note);
+                    if (audio) {
+                        audio.currentTime = 0;
+                        audio.play();
+                        
+                        // Highlight the key
+                        const key = document.querySelector(`.key[data-note="${note.note}"]`);
+                        if (key) {
+                            key.classList.add('active');
+                            setTimeout(() => {
+                                key.classList.remove('active');
+                            }, note.duration);
+                        }
+                    }
+                } else if (note.instrument === 'talking-drum') {
+                    // For talking drum, we need to recreate the oscillator
+                    if (drumContext && talkingDrum) {
+                        const tempOsc = drumContext.createOscillator();
+                        const tempGain = drumContext.createGain();
+                        
+                        // Create filter for tone control
+                        const resonance = document.getElementById('drum-resonance').value / 100;
+                        const tone = document.getElementById('drum-tone').value / 100;
+                        const filter = drumContext.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.value = 500 + tone * 2000;
+                        filter.Q.value = 5 + resonance * 15;
+                        
+                        tempOsc.type = 'triangle';
+                        tempOsc.frequency.value = parseFloat(note.note);
+                        
+                        tempOsc.connect(filter);
+                        filter.connect(tempGain);
+                        tempGain.connect(drumContext.destination);
+                        
+                        tempGain.gain.setValueAtTime(0, drumContext.currentTime);
+                        tempGain.gain.linearRampToValueAtTime(0.8, drumContext.currentTime + 0.01);
+                        
+                        tempOsc.start();
+                        
+                        // Visual feedback
+                        talkingDrum.style.transform = 'scale(0.95)';
+                        
+                        // Stop after duration
+                        setTimeout(() => {
+                            tempGain.gain.setValueAtTime(tempGain.gain.value, drumContext.currentTime);
+                            tempGain.gain.exponentialRampToValueAtTime(0.001, drumContext.currentTime + 0.2);
+                            
+                            setTimeout(() => {
+                                tempOsc.stop();
+                                talkingDrum.style.transform = 'scale(1)';
+                            }, 200);
+                        }, note.duration);
+                    }
+                }
+            }, note.time);
+        });
+        
+        // Reset status after playback
+        const lastNote = sortedNotes[sortedNotes.length - 1];
+        setTimeout(() => {
+            if (statusElement) {
+                statusElement.textContent = 'Playback complete';
+                
+                // Reset after a moment
+                setTimeout(() => {
+                    statusElement.textContent = instrument === 'talking-drum' ? 
+                        'Click and drag to play' : 
+                        'Ready to play';
+                    statusElement.style.color = '';
+                }, 2000);
+            }
+        }, lastNote.time + 1000);
+    }
+    
+    function saveRecording(instrument) {
+        if (recordedNotes.length === 0) {
+            alert('No recording to save');
+            return;
+        }
+        
+        // Create a recording object
+        const recording = {
+            instrument,
+            notes: recordedNotes,
+            duration: recordedNotes.reduce((max, note) => Math.max(max, note.time), 0),
+            timestamp: new Date().toISOString()
+        };
+        
+        console.log('Recording data:', recording);
+        
+        // Create a JSON string
+        const jsonString = JSON.stringify(recording);
+        
+        // Create a blob and download link
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${instrument}-recording-${new Date().getTime()}.json`;
+        document.body.appendChild(a);
+        
+        a.click();
+        
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+        
+        alert(`Your ${instrument} recording has been saved as a file.`);
+    }
+    
+    // Create a function to export recordings as audio
+    function exportRecordingAsAudio() {
+        if (!audioContext || recordedNotes.length === 0) {
+            alert('No recording to export');
+            return;
+        }
+        
+        // This is a placeholder for actual audio export functionality
+        // In a real implementation, you would use the Web Audio API to create a buffer
+        // and convert the recorded notes to an audio file
+        
+        alert('Audio export functionality would be implemented here. This would convert your recorded notes to an audio file.');
+    }
+    
+    // Make tutorial cards clickable
+    const tutorialCards = document.querySelectorAll('.tutorial-card');
+    tutorialCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // In a real application, this would open the tutorial
+            const title = this.querySelector('h3').textContent;
+            alert(`Tutorial: "${title}" would play here!`);
+        });
+    });
+    
+    // Make content cards clickable
+    const contentCards = document.querySelectorAll('.content-card');
+    contentCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // In a real application, this would open the content
+            const title = this.querySelector('h3').textContent;
+            alert(`Content: "${title}" would play here!`);
+        });
+    });
+    
+    // Handle window resize for canvas
+    window.addEventListener('resize', function() {
+        if (canvas) {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+    });
+    
+    // Initialize the audio context when the page loads
+    window.addEventListener('click', function() {
+        initializeAudioContext();
+    }, { once: true });
+    
+    // Add keyboard shortcuts for common actions
+    window.addEventListener('keydown', function(e) {
+        // Space bar to toggle play/pause
+        if (e.keyCode === 32 && e.target === document.body) {
+            e.preventDefault(); // Prevent page scrolling
+            document.getElementById('play-btn')?.click();
+        }
+        
+        // R key to start/stop recording
+        if (e.keyCode === 82 && e.target === document.body) {
+            e.preventDefault();
+            // Find the active instrument tab
+            const activeTab = document.querySelector('.instrument-tab.active');
+            if (activeTab) {
+                const instrument = activeTab.id.replace('-tab', '');
+                const isCurrentlyRecording = document.getElementById(`record-${instrument}`)?.disabled;
+                
+                if (isCurrentlyRecording) {
+                    document.getElementById(`stop-record-${instrument}`)?.click();
+                } else {
+                    document.getElementById(`record-${instrument}`)?.click();
+                }
+            }
+        }
+    });
+});
+     
+        
+    
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divine Media Network</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <h1>Divine Media Network</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#programs-videos" class="nav-link"><i class="fas fa-video"></i> Programs & Videos</a></li>
+                <li><a href="#electronic-drums" class="nav-link"><i class="fas fa-drum"></i> Electronic Drums</a></li>
+                <li><a href="#piano" class="nav-link"><i class="fas fa-music"></i> Piano</a></li>
+                <li><a href="#talking-drums" class="nav-link"><i class="fas fa-drum-steelpan"></i> Talking Drums</a></li>
+                <li><a href="#tutorials" class="nav-link"><i class="fas fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="#recordings" class="nav-link"><i class="fas fa-microphone"></i> My Recordings</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home/Landing Section -->
+        <section id="home" class="section hero-section">
+            <div class="hero-content">
+                <h1 class="glitch-text" data-text="Play. Create. Learn.">Play. Create. Learn.</h1>
+                <p class="subtitle">Discover your musical talent with our interactive instruments</p>
+                <div class="hero-buttons">
+                    <a href="#electronic-drums" class="btn btn-primary">Start Playing <i class="fas fa-play"></i></a>
+                    <a href="#tutorials" class="btn btn-secondary">Learn How <i class="fas fa-graduation-cap"></i></a>
+                </div>
+                <div class="featured-instruments">
+                    <div class="instrument-icon">
+                        <i class="fas fa-drum"></i>
+                        <span>Electronic Drums</span>
+                    </div>
+                    <div class="instrument-icon">
+                        <i class="fas fa-music"></i>
+                        <span>Piano</span>
+                    </div>
+                    <div class="instrument-icon">
+                        <i class="fas fa-drum-steelpan"></i>
+                        <span>Talking Drums</span>
+                    </div>
+                </div>
+            </div>
+            <div class="audio-wave">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+        </section>
+
+        <!-- Programs and Videos Section (Blog) -->
+        <section id="programs-videos" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-video"></i> Programs & Videos</h2>
+                <p>Explore our latest music programs, tutorials, and performances.</p>
+            </div>
+
+            <div class="programs-grid">
+                <!-- Example Program/Video Card 1 -->
+                <div class="program-card">
+                    <div class="program-image">
+                        <img src="https://via.placeholder.com/400x250/6a11cb/ffffff?text=New+Electronic+Course" alt="New Electronic Course">
+                        <a href="https://youtu.be/your-video-link-1" target="_blank" class="play-icon"><i class="fas fa-play"></i></a>
+                    </div>
+                    <div class="program-info">
+                        <h3>Mastering Electronic Beats</h3>
+                        <p>Dive deep into advanced electronic drum programming and sound design.</p>
+                        <span class="program-meta"><i class="far fa-calendar-alt"></i> Oct 26, 2025</span>
+                    </div>
+                </div>
+
+                <!-- Example Program/Video Card 2 -->
+                <div class="program-card">
+                    <div class="program-image">
+                        <img src="https://via.placeholder.com/400x250/2575fc/ffffff?text=Piano+Improvisation" alt="Piano Improvisation">
+                        <a href="https://youtu.be/your-video-link-2" target="_blank" class="play-icon"><i class="fas fa-play"></i></a>
+                    </div>
+                    <div class="program-info">
+                        <h3>Piano Improvisation Techniques</h3>
+                        <p>Unlock your creativity with essential jazz and blues improvisation skills.</p>
+                        <span class="program-meta"><i class="far fa-calendar-alt"></i> Oct 20, 2025</span>
+                    </div>
+                </div>
+
+                <!-- Example Program/Video Card 3 -->
+                <div class="program-card">
+                    <div class="program-image">
+                        <img src="https://via.placeholder.com/400x250/11998e/ffffff?text=Talking+Drums+History" alt="Talking Drums History">
+                        <a href="https://youtu.be/your-video-link-3" target="_blank" class="play-icon"><i class="fas fa-play"></i></a>
+                    </div>
+                    <div class="program-info">
+                        <h3>The History of Talking Drums</h3>
+                        <p>A documentary exploring the rich cultural heritage of African talking drums.</p>
+                        <span class="program-meta"><i class="far fa-calendar-alt"></i> Oct 15, 2025</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Electronic Drum Set Section -->
+        <section id="electronic-drums" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-drum"></i> Electronic Drum Kit</h2>
+                <p>Create electronic beats with our modern drum machine</p>
+            </div>
+
+            <div class="drum-set-container">
+                <div class="status-display" id="drum-status">Click on pads or use keyboard</div>
+                <div class="control-panel">
+    <button class="record-btn" id="record-drums" data-instrument="drums">
+        <i class="fas fa-circle"></i> Record
+    </button>
+    <button class="stop-btn" id="stop-drums" data-instrument="drums" disabled>
+        <i class="fas fa-stop"></i> Stop
+    </button>
+    <div class="tempo-control">
+        <label for="tempo">Tempo: <span id="tempo-value">120</span> BPM</label>
+        <input type="range" id="tempo" min="40" max="240" value="120">
+    </div>
+</div>
+
+                <!-- Update the drum pad section to ensure data-key attributes match keyboard keys -->
+                <div class="drum-set electronic-drum-set">
+                    <div class="drum-pad kick" data-key="32" data-note="kick">
+                        <span class="key-hint">Space</span>
+                        <span class="pad-label">Kick</span>
+                    </div>
+                    <div class="drum-pad snare" data-key="81" data-note="snare">
+                        <span class="key-hint">Q</span>
+                        <span class="pad-label">Snare</span>
+                    </div>
+                    <div class="drum-pad hihat-closed" data-key="87" data-note="hihat-closed">
+                        <span class="key-hint">W</span>
+                        <span class="pad-label">Hi-Hat Closed</span>
+                    </div>
+                    <div class="drum-pad hihat-open" data-key="69" data-note="hihat-open">
+                        <span class="key-hint">E</span>
+                        <span class="pad-label">Hi-Hat Open</span>
+                    </div>
+                    <div class="drum-pad tom1" data-key="82" data-note="tom1">
+                        <span class="key-hint">R</span>
+                        <span class="pad-label">Tom 1</span>
+                    </div>
+                    <div class="drum-pad tom2" data-key="84" data-note="tom2">
+                        <span class="key-hint">T</span>
+                        <span class="pad-label">Tom 2</span>
+                    </div>
+                    <div class="drum-pad floor-tom" data-key="65" data-note="floor-tom">
+                        <span class="key-hint">A</span>
+                        <span class="pad-label">Floor Tom</span>
+                    </div>
+                    <div class="drum-pad crash" data-key="83" data-note="crash">
+                        <span class="key-hint">S</span>
+                        <span class="pad-label">Crash</span>
+                    </div>
+                    <div class="drum-pad ride" data-key="68" data-note="ride">
+                        <span class="key-hint">D</span>
+                        <span class="pad-label">Ride</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-drums" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="reset-drums" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button id="drum-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+            </div>
+        </section>
+
+        <!-- Piano Pad Section -->
+        <section id="piano" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-music"></i> Piano Pad</h2>
+                <p>Create melodies with our touch-responsive piano pad</p>
+            </div>
+            
+            <div class="piano-container">
+                <div class="status-display" id="piano-status">Ready to play</div>
+                <div class="control-panel">
+    <button class="record-btn" id="record-piano" data-instrument="piano">
+        <i class="fas fa-circle"></i> Record
+    </button>
+    <button class="stop-btn" id="stop-piano" data-instrument="piano" disabled>
+        <i class="fas fa-stop"></i> Stop
+    </button>
+</div>
+                <div class="piano-pad-wrapper">
+                    <canvas id="piano-touch-pad" width="800" height="300"></canvas>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-piano" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="piano-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+            </div>
+        </section>
+
+        <!-- Talking Drums Section -->
+        <section id="talking-drums" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-drum-steelpan"></i> Talking Drums</h2>
+                <p>Experience the rhythmic tradition of African talking drums</p>
+            </div>
+
+            <div class="talking-drums-container">
+                <div class="talking-drums-set">
+                    <div class="talking-drum-large" id="talking-drum-large">
+                        <div class="drum-body"></div>
+                        <div class="drum-top"></div>
+                        <div class="drum-bottom"></div>
+                    </div>
+                    <div class="talking-drum-medium" id="talking-drum-medium">
+                        <div class="drum-body"></div>
+                        <div class="drum-top"></div>
+                        <div class="drum-bottom"></div>
+                    </div>
+                    <div class="talking-drum-small" id="talking-drum-small">
+                        <div class="drum-body"></div>
+                        <div class="drum-top"></div>
+                        <div class="drum-bottom"></div>
+                    </div>
+                </div>
+
+                <div class="talking-drums-controls">
+                    <div class="status-display" id="talking-drum-status">Click and drag on drums to play</div>
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label for="drum-resonance">Resonance:</label>
+                            <input type="range" id="drum-resonance" min="0" max="100" value="70">
+                        </div>
+                        <div class="control-group">
+                            <label for="drum-tone">Tone:</label>
+                            <input type="range" id="drum-tone" min="0" max="100" value="50">
+                        </div>
+                        <button id="record-talking-drums" class="record-btn" data-instrument="talking-drums">
+    <i class="fas fa-circle"></i> Record
+</button>
+<button id="stop-talking-drums" class="stop-btn" data-instrument="talking-drums" disabled>
+    <i class="fas fa-stop"></i> Stop
+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rhythm-patterns">
+                <h3>Traditional Rhythm Patterns</h3>
+                <div class="rhythm-buttons">
+                    <button class="rhythm-btn" data-rhythm="dundun">Dundun</button>
+                    <button class="rhythm-btn" data-rhythm="highlife">Highlife</button>
+                    <button class="rhythm-btn" data-rhythm="jembe">Jembe</button>
+                    <button class="rhythm-btn" data-rhythm="fanga">Fanga</button>
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="save-talking-drums" class="btn btn-primary" disabled>
+                    <i class="fas fa-save"></i> Save Recording
+                </button>
+                <button id="talking-drum-tutorial-btn" class="btn btn-info">
+                    <i class="fas fa-graduation-cap"></i> How to Play
+                </button>
+            </div>
+        </section>
+
+        <!-- Tutorials Section -->
+        <section id="tutorials" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-graduation-cap"></i> Learn Music</h2>
+                <p>Master the basics with our step-by-step tutorials</p>
+            </div>
+
+            <div class="tutorial-tabs">
+                <button class="tab-btn active" data-tab="all-tutorials">All</button>
+                <button class="tab-btn" data-tab="drums-tutorials">Electronic Drums</button>
+                <button class="tab-btn" data-tab="piano-tutorials">Piano</button>
+                <button class="tab-btn" data-tab="talking-drums-tutorials">Talking Drums</button>
+            </div>
+
+            <div class="tutorial-container">
+                <div class="tutorial-grid active" id="all-tutorials">
+                    <!-- All Tutorials -->
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="Screenshot_20250312-230503.png" alt="Electronic Drum Basics">
+                           <a href="https://youtu.be/hMMHB95RXyk?si=Eo9dLGepqr7SKW1q"><div class="play-icon"><i class="fas fa-play"></i></div></a>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Electronic Drum Basics</h3>
+                            <p>Learn the fundamental techniques and beats</p>
+                            <span class="duration"><i class="far fa-clock"></i> 10 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/2575fc/ffffff" alt="Piano Fundamentals">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Piano Fundamentals</h3>
+                            <p>Master notes, scales and basic melodies</p>
+                            <span class="duration"><i class="far fa-clock"></i> 20 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/6a11cb/ffffff" alt="Advanced Drum for Beginners">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Advanced Electronic Drum</h3>
+                            <p>Learn complex rhythms and patterns</p>
+                            <span class="duration"><i class="far fa-clock"></i> 25 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/2575fc/ffffff" alt="Talking Drum Basics">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level beginner">Beginner</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Talking Drum Basics</h3>
+                            <p>Learn the traditional techniques and sounds</p>
+                            <span class="duration"><i class="far fa-clock"></i> 18 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/6a11cb/ffffff" alt="Advanced Beat Making">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level advanced">Advanced</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Advanced Beat Making</h3>
+                            <p>Master complex electronic rhythms</p>
+                            <span class="duration"><i class="far fa-clock"></i> 30 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-image">
+                            <img src="https://via.placeholder.com/400x250/2575fc/ffffff" alt="Piano Sound Design">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                            <span class="level intermediate">Intermediate</span>
+                        </div>
+                        <div class="tutorial-info">
+                            <h3>Piano Sound Design</h3>
+                            <p>Learn to create unique piano sounds</p>
+                            <span class="duration"><i class="far fa-clock"></i> 35 minutes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Individual instrument tutorial tabs will be populated with JavaScript -->
+                <div class="tutorial-grid" id="drums-tutorials"></div>
+                <div class="tutorial-grid" id="piano-tutorials"></div> 
+                <div class="tutorial-grid" id="talking-drums-tutorials"></div>
+            </div>
+        </section>
+
+        <!-- Recordings Section -->
+        <section id="recordings" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-microphone"></i> My Recordings</h2>
+                <p>Listen to, download, and share your musical creations</p>
+            </div>
+
+            <div class="recordings-container">
+                <div class="no-recordings" id="no-recordings">
+                    <i class="fas fa-music"></i>
+                    <p>You haven't created any recordings yet.</p>
+                    <p>Go to any instrument section and click "Record" to get started!</p>
+                </div>
+
+                <div class="recordings-list" id="recordings-list">
+                    <!-- Recordings will be dynamically added here -->
+                </div>
+            </div>
+
+            <div class="section-footer">
+                <button id="mix-all" class="btn btn-primary">
+                    <i class="fas fa-layer-group"></i> Mix All Tracks
+                </button>
+                <button id="clear-recordings" class="btn btn-secondary">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-music"></i>
+                <h2>Divine Media Network</h2>
+                <p>Discover the musician inside you</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#programs-videos">Programs & Videos</a></li>
+                    <li><a href="#electronic-drums">Electronic Drums</a></li>
+                    <li><a href="#piano">Piano</a></li>
+                    <li><a href="#talking-drums">Talking Drums</a></li>
+                    <li><a href="#tutorials">Tutorials</a></li>
+                    <li><a href="#recordings">My Recordings</a></li>
+                </ul>
+            </div>
+            <div class="footer-newsletter">
+                <h3>Stay Updated</h3>
+                <p>Subscribe to our newsletter for the latest updates</p>
+                <form id="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+            <div class="footer-social">
+                <h3>Connect With Us</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-soundcloud"></i></a>
+                    <a href="https://wa.me/1234567890" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Divine Media Network. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Templates -->
+    <div class="modal" id="tutorial-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>How to Play</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be dynamically added -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="payment-modal">
+  <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div class="modal-header">
+          <h2>Complete Your Purchase</h2>
+      </div>
+      <div class="modal-body">
+          <div class="payment-details">
+              <h3>Download Your Recording</h3>
+              <p>Your amazing creation is ready to download! Complete the payment to get your high-quality audio file.</p>
+              <div class="price-info">
+                  <p class="price">$5.00</p>
+                  <p class="description">High-quality audio download</p>
+              </div>
+              <div class="payment-benefits">
+                  <h4>What you get:</h4>
+                  <ul>
+                      <li><i class="fas fa-check"></i> High-quality WAV file</li>
+                      <li><i class="fas fa-check"></i> Commercial usage rights</li>
+                      <li><i class="fas fa-check"></i> Unlimited downloads</li>
+                      <li><i class="fas fa-check"></i> Support independent artists</li>
+                  </ul>
+              </div>
+              <div class="payment-form">
+                  <div class="flutterwave-button">
+                      <button id="flutterwave-pay-btn" class="btn btn-primary">
+                          <i class="fas fa-credit-card"></i> Pay with Flutterwave
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+    <!-- Audio Elements -->
+    <!-- Electronic Drum Kit Sounds -->
+    <audio id="kick" src="kick-greg-232043.mp3" preload="auto"></audio>
+    <audio id="snare" src="snare-drum-5-91466.mp3" preload="auto"></audio>
+    <audio id="hihat-closed" src="hi-hat-8-231040.mp3" preload="auto"></audio>
+    <audio id="hihat-open" src="hi-hat-231042.mp3" preload="auto"></audio>
+    <audio id="tom1" src="tom-0104-107508.mp3" preload="auto"></audio>
+    <audio id="tom2" src="tom-2-85124.mp3" preload="auto"></audio>
+    <audio id="floor-tom" src="floor-tom-107404.mp3" preload="auto"></audio>
+    <audio id="crash" src="crash-1-97700.mp3" preload="auto"></audio>
+    <audio id="ride" src="electronic-ride-3-47404.mp3" preload="auto"></audio> 
+
+     <!-- Piano notes -->
+     <audio id="C3" src="sounds/piano/C3.mp3" preload="auto"></audio>
+     <audio id="D3" src="sounds/piano/D3.mp3" preload="auto"></audio>
+     <audio id="E3" src="sounds/piano/E3.mp3" preload="auto"></audio>
+     <audio id="F3" src="sounds/piano/F3.mp3" preload="auto"></audio>
+     <audio id="G3" src="sounds/piano/G3.mp3" preload="auto"></audio>
+     <audio id="A3" src="sounds/piano/A3.mp3" preload="auto"></audio>
+     <audio id="B3" src="sounds/piano/B3.mp3" preload="auto"></audio>
+     
+     <audio id="C4" src="sounds/piano/C4.mp3" preload="auto"></audio>
+     <audio id="D4" src="sounds/piano/D4.mp3" preload="auto"></audio>
+     <audio id="E4" src="sounds/piano/E4.mp3" preload="auto"></audio>
+     <audio id="F4" src="sounds/piano/F4.mp3" preload="auto"></audio>
+     <audio id="G4" src="sounds/piano/G4.mp3" preload="auto"></audio>
+     <audio id="A4" src="sounds/piano/A4.mp3" preload="auto"></audio>
+     <audio id="B4" src="sounds/piano/B4.mp3" preload="auto"></audio>
+     
+     <audio id="C5" src="sounds/piano/C5.mp3" preload="auto"></audio>
+     <audio id="D5" src="sounds/piano/D5.mp3" preload="auto"></audio>
+     <audio id="E5" src="sounds/piano/E5.mp3" preload="auto"></audio>
+     <audio id="F5" src="sounds/piano/F5.mp3" preload="auto"></audio>
+     <audio id="G5" src="sounds/piano/G5.mp3" preload="auto"></audio>
+     <audio id="A5" src="sounds/piano/A5.mp3" preload="auto"></audio>
+     <audio id="B5" src="sounds/piano/B5.mp3" preload="auto"></audio>
+    
+    <!-- Talking Drum Sounds -->
+    <audio id="talking-drum-high" src="https://assets.mixkit.co/sfx/preview/mixkit-tribal-dry-drum-558.mp3" preload="auto"></audio>
+    <audio id="talking-drum-mid" src="https://assets.mixkit.co/sfx/preview/mixkit-hand-tribal-drum-562.mp3" preload="auto"></audio>
+    <audio id="talking-drum-low" src="https://assets.mixkit.co/sfx/preview/mixkit-drum-and-percussion-545.mp3" preload="auto"></audio>
+
+    <script src="scripts.js"></script>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script src="enhanced-mix-tracks.js"></script>
+
+    <!-- Add this to the end of your HTML file to load the new functions -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Load the adaptive beat functions
+            const script = document.createElement("script")
+            script.src = "adaptive-beat-functions.js" // Assuming this file exists or its content is merged into scripts.js
+            document.body.appendChild(script)
+
+            console.log("Adaptive beat functions loaded")
+        })
+    </script>
+
+</body>
+</html>

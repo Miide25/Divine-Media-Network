@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Authentication - Divine Media Network</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-blue-500 to-teal-400 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-lg">
+    <div class="text-center mb-8">
+      <i class="fas fa-music text-6xl text-purple-600 mb-4"></i>
+      <h1 id="form-title" class="text-2xl font-bold text-gray-800">User  Login</h1>
+      <p id="form-subtitle" class="text-gray-600 mt-2">Access your account</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex mb-6 rounded-lg overflow-hidden shadow">
+      <button
+        id="login-tab"
+        class="tab-btn flex-1 py-3 px-6 bg-purple-600 text-white font-semibold transition duration-300 focus:outline-none"
+      >
+        Login
+      </button>
+      <button
+        id="signup-tab"
+        class="tab-btn flex-1 py-3 px-6 bg-gray-200 text-gray-700 font-semibold transition duration-300 focus:outline-none"
+      >
+        Create Account
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" class="tab-content active">
+      <form id="login-form-element" class="space-y-6">
+        <div>
+          <label for="login-username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-gray-400"></i>
+            </div>
+            <input
+              type="text"
+              id="login-username"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Enter username"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input
+              type="password"
+              id="login-password"
+              class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Enter password"
+              required
+            />
+            <button
+              type="button"
+              id="show-password"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Toggle password visibility"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition duration-300 font-medium flex items-center justify-center gap-2"
+        >
+          <span id="login-text">Login</span>
+          <i class="fas fa-sign-in-alt"></i>
+        </button>
+      </form>
+
+      <div id="login-error-message" class="mt-4 text-center text-red-600 font-medium hidden">
+        Invalid username or password
+      </div>
+
+    
+
+    <!-- Signup Form -->
+    <div id="signup-form" class="tab-content">
+      <form id="signup-form-element" class="space-y-6">
+        <div>
+          <label for="signup-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-gray-400"></i>
+            </div>
+            <input
+              type="text"
+              id="signup-name"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Enter your full name"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="signup-username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-id-card text-gray-400"></i>
+            </div>
+            <input
+              type="text"
+              id="signup-username"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Choose a username"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            <input
+              type="email"
+              id="signup-email"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input
+              type="password"
+              id="signup-password"
+              class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Create a password"
+              required
+            />
+            <button
+              type="button"
+              id="show-signup-password"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Toggle password visibility"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input
+              type="password"
+              id="signup-confirm-password"
+              class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Confirm your password"
+              required
+            />
+            <button
+              type="button"
+              id="show-confirm-password"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Toggle password visibility"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 font-medium flex items-center justify-center gap-2"
+        >
+          <span id="signup-text">Create Account</span>
+          <i class="fas fa-user-plus"></i>
+        </button>
+      </form>
+
+      <div id="signup-error-message" class="mt-4 text-center text-red-600 font-medium hidden"></div>
+      <div id="signup-success-message" class="mt-4 text-center text-green-600 font-medium hidden">
+        Account created successfully!
+      </div>
+    </div>
+
+    <button
+      id="back-to-splash"
+      class="mt-6 w-full bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300 font-medium flex items-center justify-center gap-2"
+    >
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </button>
+  </div>
+
+  <script>
+    // Tab switching
+    const loginTab = document.getElementById('login-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const formTitle = document.getElementById('form-title');
+    const formSubtitle = document.getElementById('form-subtitle');
+
+    loginTab.addEventListener('click', () => {
+      loginForm.classList.add('active');
+      signupForm.classList.remove('active');
+      loginTab.classList.add('bg-purple-600', 'text-white');
+      loginTab.classList.remove('bg-gray-200', 'text-gray-700');
+      signupTab.classList.remove('bg-purple-600', 'text-white');
+      signupTab.classList.add('bg-gray-200', 'text-gray-700');
+      formTitle.textContent = 'User  Login';
+      formSubtitle.textContent = 'Access your account';
+    });
+
+    signupTab.addEventListener('click', () => {
+      signupForm.classList.add('active');
+      loginForm.classList.remove('active');
+      signupTab.classList.add('bg-purple-600', 'text-white');
+      signupTab.classList.remove('bg-gray-200', 'text-gray-700');
+      loginTab.classList.remove('bg-purple-600', 'text-white');
+      loginTab.classList.add('bg-gray-200', 'text-gray-700');
+      formTitle.textContent = 'Create Account';
+      formSubtitle.textContent = 'Join Divine Media Network';
+    });
+
+    // Password visibility toggles
+    function togglePasswordVisibility(buttonId, inputId) {
+      const button = document.getElementById(buttonId);
+      const input = document.getElementById(inputId);
+      button.addEventListener('click', () => {
+        if (input.type === 'password') {
+          input.type = 'text';
+          button.querySelector('i').classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+          input.type = 'password';
+          button.querySelector('i').classList.replace('fa-eye-slash', 'fa-eye');
+        }
+      });
+    }
+    togglePasswordVisibility('show-password', 'login-password');
+    togglePasswordVisibility('show-signup-password', 'signup-password');
+    togglePasswordVisibility('show-confirm-password', 'signup-confirm-password');
+
+    // Back to splash
+    document.getElementById('back-to-splash').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // Admin credentials
+    const adminCredentials = { username: 'admin', password: 'admin123' };
+
+    // Login form submission
+    document.getElementById('login-form-element').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      const loginText = document.getElementById('login-text');
+      const errorMessage = document.getElementById('login-error-message');
+
+      loginText.textContent = 'Logging in...';
+
+      setTimeout(() => {
+        if (username === adminCredentials.username && password === adminCredentials.password) {
+          localStorage.setItem('adminLoggedIn', 'true');
+          localStorage.setItem('userType', 'admin');
+          localStorage.removeItem('normalUser ');
+          window.location.href = 'admin.html';
+          return;
+        }
+
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+          localStorage.setItem('normalUser ', JSON.stringify(user));
+          localStorage.removeItem('adminLoggedIn');
+          localStorage.setItem('userType', 'user');
+          window.location.href = 'main.html';
+        } else {
+          loginText.textContent = 'Login';
+          errorMessage.classList.remove('hidden');
+          setTimeout(() => {
+            errorMessage.classList.add('hidden');
+          }, 3000);
+        }
+      }, 1000);
+    });
+
+    // Signup form submission
+    document.getElementById('signup-form-element').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('signup-name').value.trim();
+      const username = document.getElementById('signup-username').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+      const signupText = document.getElementById('signup-text');
+      const errorMessage = document.getElementById('signup-error-message');
+      const successMessage = document.getElementById('signup-success-message');
+
+      if (!name || !username || !email || !password || !confirmPassword) {
+        errorMessage.textContent = 'Please fill in all fields';
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        errorMessage.textContent = 'Passwords do not match';
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      if (users.find(u => u.username === username)) {
+        errorMessage.textContent = 'Username already taken';
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      // Create new user
+      const newUser  = {
+        id: Date.now(),
+        name,
+        username,
+        email,
+        password,
+        registeredAt: new Date().toISOString()
+      };
+
+      users.push(newUser );
+      localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('normalUser ', JSON.stringify(newUser ));
+      localStorage.setItem('userType', 'user');
+
+      signupText.textContent = 'Creating...';
+      errorMessage.classList.add('hidden');
+
+      setTimeout(() => {
+        successMessage.classList.remove('hidden');
+        setTimeout(() => {
+          window.location.href = 'main.html';
+        }, 1500);
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

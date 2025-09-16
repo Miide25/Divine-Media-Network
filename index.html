@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Divine Media Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-blue-500 to-teal-400 min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <div class="mb-8">
+            <i class="fas fa-music text-8xl text-white drop-shadow-lg animate-bounce"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-white mb-4">Divine Media Network</h1>
+        <p class="text-xl text-white/90 mb-8">Discover the musician inside you</p>
+        <button 
+            id="continue-btn" 
+            class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+            Continue <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+    </div>
+
+    <script>
+        document.getElementById('continue-btn').addEventListener('click', function() {
+            window.location.href = 'auth.html';
+        });
+    </script>
+</body>
+</html>
