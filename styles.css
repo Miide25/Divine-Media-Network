@@ -207,22 +207,22 @@
   
   @keyframes glitch {
     0% {
-      clip-path: inset(40% 0 61% 0);
+        clip-path: inset(40% 0 61% 0);
     }
     20% {
-      clip-path: inset(92% 0 1% 0);
+        clip-path: inset(92% 0 1% 0);
     }
     40% {
-      clip-path: inset(43% 0 1% 0);
+        clip-path: inset(43% 0 1% 0);
     }
     60% {
-      clip-path: inset(25% 0 58% 0);
+        clip-path: inset(25% 0 58% 0);
     }
     80% {
-      clip-path: inset(54% 0 7% 0);
+        clip-path: inset(54% 0 7% 0);
     }
     100% {
-      clip-path: inset(58% 0 43% 0);
+        clip-path: inset(58% 0 43% 0);
     }
   }
   
@@ -418,7 +418,7 @@
   
   .electronic-drum-set {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
     grid-gap: 20px;
     padding: 20px;
     background: #1a1a2e;
@@ -428,16 +428,18 @@
   
   .drum-pad {
     position: relative;
-    height: 120px;
+    height: 120px; /* Fixed height, but will scale with grid */
     background: linear-gradient(145deg, #222, #333);
     border-radius: 10px;
     display: flex;
+    flex-direction: column; /* Allow label and hint to stack */
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: all 0.1s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    padding: 10px; /* Add padding for content */
   }
   
   .drum-pad::after {
@@ -464,24 +466,25 @@
   
   .key-hint {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 5px; /* Adjusted for smaller screens */
+    right: 5px; /* Adjusted for smaller screens */
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 0.25rem 0.5rem;
+    padding: 0.15rem 0.3rem; /* Smaller padding */
     border-radius: 4px;
-    font-size: 0.8rem;
+    font-size: 0.7rem; /* Smaller font size */
     z-index: 5;
     font-weight: bold;
   }
   
   .pad-label {
     color: white;
-    font-size: 1.2rem;
+    font-size: 1rem; /* Adjusted for smaller screens */
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
     z-index: 5;
+    text-align: center;
   }
   
   .kick {
@@ -513,31 +516,63 @@
   
   /* Piano Pad Styles */
   .piano-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    background-color: white;
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    box-shadow: var(--box-shadow);
-  }
-  
-  .piano-pad-wrapper {
-    width: 100%;
-    overflow: hidden;
-    background-color: #1a1a2e;
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-  }
-  
-  #piano-touch-pad {
-    width: 100%;
-    height: 300px;
-    border-radius: 8px;
-    cursor: pointer;
-    touch-action: none;
-  }
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.piano {
+  display: flex;
+  min-width: 700px; /* Ensure horizontal scroll on small screens */
+  user-select: none;
+}
+
+.key {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.key.white {
+  width: 50px;
+  height: 300px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0 0 5px 5px;
+  color: #333;
+  position: relative;
+  z-index: 1;
+}
+
+.key.black {
+  position: absolute;
+  width: 30px;
+  height: 180px;
+  background: black;
+  border-radius: 0 0 5px 5px;
+  color: white;
+  z-index: 2;
+  margin-left: -15px;
+}
+
+.key.active {
+  background: linear-gradient(to bottom, #6a11cb, #8b5cf6);
+  color: white;
+}
+
+.piano-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
   
   /* Talking Drums Styles */
   .talking-drums-container {
@@ -563,6 +598,7 @@
     position: relative;
     cursor: pointer;
     transition: var(--transition);
+    flex-shrink: 0; /* Prevent shrinking too much */
   }
   
   .talking-drum-large {
@@ -663,6 +699,7 @@
   .control-panel {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center; /* Center controls */
     gap: 1rem;
     background-color: #f5f5f5;
     padding: 1rem;
@@ -679,7 +716,7 @@
     font-weight: 500;
   }
   
-  .record-btn {
+  .record-btn, .stop-btn { /* Apply styles to stop-btn as well */
     padding: 0.5rem 1rem;
     border-radius: var(--border-radius);
     background-color: #f0f0f0;
@@ -689,16 +726,16 @@
     transition: var(--transition);
   }
   
-  .record-btn:hover:not(:disabled) {
+  .record-btn:hover:not(:disabled), .stop-btn:hover:not(:disabled) {
     background-color: #e0e0e0;
   }
   
-  .record-btn:disabled {
+  .record-btn:disabled, .stop-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
   
-  .record-btn i {
+  .record-btn i, .stop-btn i {
     font-size: 0.9rem;
   }
   
@@ -706,16 +743,11 @@
     color: var(--danger-color);
   }
   
-  .tempo-control {
+  .tempo-control, .control-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-  
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    min-width: 120px; /* Ensure controls have a minimum width */
   }
   
   /* Tutorial Styles */
@@ -746,7 +778,7 @@
   
   .tutorial-grid {
     display: none;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Adjusted minmax for smaller screens */
     gap: 2rem;
   }
   
@@ -801,9 +833,17 @@
     opacity: 0;
     transition: var(--transition);
   }
-  
+
   .tutorial-card:hover .play-icon {
     opacity: 1;
+  }
+
+  /* Make play icons always visible for blog posts/programs */
+  .program-image .play-icon {
+    opacity: 1 !important;
+    background: rgba(255, 0, 0, 0.8) !important;
+    border: 3px solid white !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
   }
   
   .level {
@@ -1093,7 +1133,7 @@
   /* Programs and Videos Section */
   .programs-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Adjusted minmax for responsiveness */
       gap: 2rem;
   }
   
@@ -1102,7 +1142,7 @@
       overflow: hidden;
       box-shadow: var(--box-shadow);
       transition: var(--transition);
-      background-color: white;
+      background: var(--dark-gradient);
       cursor: pointer;
   }
   
@@ -1133,34 +1173,93 @@
   
   .program-info h3 {
       margin-bottom: 0.5rem;
-      color: var(--dark-color);
+      color: white;
   }
-  
+
   .program-info p {
-      color: #666;
+      color: white;
       font-size: 0.9rem;
       margin-bottom: 0.5rem;
   }
-  
+
   .program-meta {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: #888;
+      color: white;
       font-size: 0.8rem;
+  }
+
+  /* Blog Post Modal Specific Styles */
+  .blog-post-video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      background-color: black;
+      border-radius: var(--border-radius);
+  }
+
+  .blog-post-video-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+  }
+
+  .comments-section {
+      background-color: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+  }
+
+  .comments-section h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+  }
+
+  .comments-list {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 10px; /* For scrollbar */
+  }
+
+  .add-comment-form textarea {
+      resize: vertical;
   }
   
   /* Responsive Styles */
   @media (max-width: 1200px) {
     .electronic-drum-set {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* More compact on larger tablets */
     }
+    .talking-drum-large { width: 150px; height: 250px; }
+    .talking-drum-medium { width: 120px; height: 200px; }
+    .talking-drum-small { width: 90px; height: 150px; }
   }
   
   @media (max-width: 992px) {
     .nav-container {
       padding: 0 1rem;
     }
+    .hero-content h1 { font-size: 3.5rem; }
+    .subtitle { font-size: 1.3rem; }
+    .section-header h2 { font-size: 2rem; }
+    .section-header p { font-size: 1rem; }
+    .electronic-drum-set {
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Even more compact */
+      grid-gap: 15px;
+    }
+    .drum-pad { height: 100px; }
+    .pad-label { font-size: 0.9rem; }
+    .key-hint { font-size: 0.6rem; padding: 0.1rem 0.2rem; }
+
+    .talking-drums-set { gap: 2rem; }
+    .talking-drum-large { width: 120px; height: 200px; }
+    .talking-drum-medium { width: 100px; height: 170px; }
+    .talking-drum-small { width: 80px; height: 140px; }
   }
   
   @media (max-width: 768px) {
@@ -1191,12 +1290,23 @@
     }
   
     .electronic-drum-set {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Even smaller pads */
+      grid-gap: 10px;
     }
-  
-    .footer-newsletter form {
-      flex-direction: column;
-    }
+    .drum-pad { height: 90px; }
+    .pad-label { font-size: 0.8rem; }
+    .key-hint { font-size: 0.5rem; }
+
+    .control-panel { flex-direction: column; align-items: center; }
+    .tempo-control, .control-group { width: 100%; max-width: 300px; }
+
+    .talking-drums-set { gap: 1.5rem; }
+    .talking-drum-large { width: 100px; height: 180px; }
+    .talking-drum-medium { width: 80px; height: 150px; }
+    .talking-drum-small { width: 60px; height: 120px; }
+
+    .modal-content { margin: 10% auto; padding: 1.5rem; }
+    .modal-header h2 { font-size: 1.5rem; }
   }
   
   @media (max-width: 576px) {
@@ -1226,6 +1336,19 @@
       gap: 1rem;
     }
   
+    .electronic-drum-set {
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); /* Smallest pads */
+      grid-gap: 8px;
+    }
+    .drum-pad { height: 80px; }
+    .pad-label { font-size: 0.7rem; }
+    .key-hint { display: none; } /* Hide key hints on very small screens */
+
+    .talking-drums-set { gap: 1rem; }
+    .talking-drum-large { width: 80px; height: 150px; }
+    .talking-drum-medium { width: 65px; height: 120px; }
+    .talking-drum-small { width: 50px; height: 90px; }
+
     .tutorial-grid {
       grid-template-columns: 1fr;
     }
@@ -1240,4 +1363,85 @@
       width: 100%;
       justify-content: space-between;
     }
+
+    .programs-grid {
+        grid-template-columns: 1fr;
+    }
+    .program-card .program-info h3 { font-size: 1.1rem; }
+    .program-card .program-info p { font-size: 0.85rem; }
+    .program-card .program-meta { font-size: 0.75rem; }
+
+    .comments-section { padding: 1rem; }
+    .comments-section h3 { font-size: 1.2rem; }
+    .add-comment-form textarea { font-size: 0.9rem; }
   }
+  .program-image {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.program-image img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+  .modal-body video {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 60vh;
+  border-radius: 8px;
+  background: black;
+}
+
+/* Video Cover Styles for Blog Post Modal */
+.video-cover {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #000 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10 !important;
+}
+
+#video-thumbnail {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.play-overlay {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  color: #fff !important;
+  font-size: 3rem !important;
+  opacity: 0.8 !important;
+  z-index: 20 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.play-overlay:hover {
+  opacity: 1 !important;
+}
+
+/* Visible play icon for blog posts */
+.visible-play-icon {
+  opacity: 1 !important;
+  background: rgba(255, 0, 0, 0.8) !important;
+  border: 3px solid white !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}

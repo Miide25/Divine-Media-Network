@@ -1,294 +1,30 @@
 // Global variables
-const drumPads = document.querySelectorAll(".drum-pad")
-const drumStatus = document.getElementById("drum-status")
-const pianoStatus = document.getElementById("piano-status")
+let drumPads
+let drumStatus
 let isRecording = false
 let recordingInstrument = null
 let recordedNotes = []
 let recordingStartTime = 0
-const savedRecordings = []
-let activeAudioContext = null
-
-// Initialize audio context with user interaction to comply with browser autoplay policies
-function initializeAudioContext() {
-  if (!activeAudioContext) {
-    try {
-      activeAudioContext = new (window.AudioContext || window.webkitAudioContext)()
-      console.log("Audio context initialized:", activeAudioContext.state)
-    } catch (e) {
-      console.error("Failed to create audio context:", e)
-    }
-  }
-
-  // Resume context if it's suspended (browsers may suspend it until user interaction)
-  if (activeAudioContext && activeAudioContext.state === "suspended") {
-    activeAudioContext
-      .resume()
-      .then(() => {
-        console.log("Audio context resumed:", activeAudioContext.state)
-      })
-      .catch((e) => {
-        console.error("Failed to resume audio context:", e)
-      })
-  }
-
-  return activeAudioContext
-}
-
-// Record note function
-function recordNote(instrument, note, duration) {
-  if (!isRecording) {
-    console.log("Not recording, note ignored:", note)
-    return
-  }
-
-  console.log(
-    `Recording ${instrument} note: ${note}, duration: ${duration}, recording instrument: ${recordingInstrument}`,
-  )
-
-  // Make sure we're recording for the correct instrument
-  if (recordingInstrument !== instrument) {
-    console.log(`Note ignored: current recording instrument is ${recordingInstrument}, but note is for ${instrument}`)
-    return
-  }
-
-  recordedNotes.push({
-    instrument,
-    note,
-    time: Date.now() - recordingStartTime,
-    duration,
-  })
-
-  console.log(`Recorded notes count: ${recordedNotes.length}`)
-}
-
-// Setup touch-based piano
-function setupPianoTouchPad() {
-  const touchPad = document.getElementById("piano-touch-pad")
-  if (!touchPad) {
-    console.error("Piano touch pad element not found")
-    return
-  }
-
-  const statusDisplay = document.getElementById("piano-status")
-
-  // Piano notes in a grid layout (4x5 grid = 20 notes)
-  const noteGrid = [
-    ["C3", "D3", "E3", "F3", "G3"],
-    ["A3", "B3", "C4", "D4", "E4"],
-    ["F4", "G4", "A4", "B4", "C5"],
-    ["D5", "E5", "F5", "G5", "A5"],
-  ]
-
-  // Colors for the pads
-  const padColors = [
-    "#ff416c",
-    "#ff4b2b",
-    "#4776e6",
-    "#8e54e9",
-    "#2193b0",
-    "#6dd5ed",
-    "#11998e",
-    "#38ef7d",
-    "#f46b45",
-    "#eea849",
-    "#614385",
-    "#516395",
-    "#6a11cb",
-    "#2575fc",
-    "#009688",
-    "#4CAF50",
-    "#3F51B5",
-    "#2196F3",
-    "#9C27B0",
-    "#E91E63",
-  ]
-
-  // Set initial dimensions
-  const updateTouchPadDimensions = () => {
-    touchPad.style.height = `${touchPad.offsetWidth * 0.5}px`
-  }
-
-  // Update on resize
-  window.addEventListener("resize", updateTouchPadDimensions)
-  updateTouchPadDimensions()
-
-  // Initialize canvas
-  const ctx = touchPad.getContext("2d")
-  const activeNotes = new Set()
-
-  // Draw the piano pad grid
-  function drawPianoPad() {
-    const width = touchPad.width
-    const height = touchPad.height
-
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height)
-
-    // Draw background
-    const gradient = ctx.createLinearGradient(0, 0, width, height)
-    gradient.addColorStop(0, "#1a1a2e")
-    gradient.addColorStop(1, "#16213e")
-    ctx.fillStyle = gradient
-    ctx.fillRect(0, 0, width, height)
-
-    // Calculate pad dimensions
-    const rows = noteGrid.length
-    const cols = noteGrid[0].length
-    const padWidth = width / cols
-    const padHeight = height / rows
-    const padding = 10
-
-    // Draw pads
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const note = noteGrid[row][col]
-        const x = col * padWidth
-        const y = row * padHeight
-        const colorIndex = row * cols + col
-
-        // Draw pad background
-        ctx.fillStyle = padColors[colorIndex]
-        ctx.fillRect(x + padding, y + padding, padWidth - padding * 2, padHeight - padding * 2)
-
-        // Add glossy effect
-        const glossGradient = ctx.createLinearGradient(
-          x + padding,
-          y + padding,
-          x + padWidth - padding * 2,
-          y + padHeight - padding * 2,
-        )
-        glossGradient.addColorStop(0, "rgba(255, 255, 255, 0.2)")
-        glossGradient.addColorStop(1, "rgba(255, 255, 255, 0)")
-        ctx.fillStyle = glossGradient
-        ctx.fillRect(x + padding, y + padding, padWidth - padding * 2, padHeight - padding * 2)
-
-        // Draw note label
-        ctx.fillStyle = "white"
-        ctx.font = "bold 16px Arial"
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        ctx.fillText(note, x + padWidth / 2, y + padHeight / 2)
-
-        // Draw active state if needed
-        if (activeNotes.has(note)) {
-          ctx.strokeStyle = "white"
-          ctx.lineWidth = 4
-          ctx.strokeRect(x + padding + 4, y + padding + 4, padWidth - padding * 2 - 8, padHeight - padding * 2 - 8)
-        }
-      }
-    }
-  }
-
-  // Play a note based on position
-  function playNoteFromPosition(x, y) {
-    const width = touchPad.width
-    const height = touchPad.height
-
-    const rows = noteGrid.length
-    const cols = noteGrid[0].length
-    const padWidth = width / cols
-    const padHeight = height / rows
-
-    // Determine which pad was clicked
-    const col = Math.floor(x / padWidth)
-    const row = Math.floor(y / padHeight)
-
-    // Check if valid pad
-    if (row >= 0 && row < rows && col >= 0 && col < cols) {
-      const note = noteGrid[row][col]
-      playPianoNote(note)
-    }
-  }
-
-  // Play a piano note
-  function playPianoNote(note) {
-    const context = initializeAudioContext()
-
-    // Add to active notes
-    activeNotes.add(note)
-
-    // Update status
-    if (pianoStatus) {
-      pianoStatus.textContent = `Playing: ${note}`
-    }
-
-    // Try to play using audio element
-    const audio = document.getElementById(note)
-    if (audio) {
-      audio.currentTime = 0
-      audio.play().catch((e) => {
-        console.error(`Error playing piano note ${note}:`, e)
-      })
-
-      // Record the note if recording
-      if (isRecording && recordingInstrument === "piano") {
-        console.log("Attempting to record piano note:", note)
-        recordNote("piano", note, 500)
-      }
-
-      // Remove from active notes after a delay
-      setTimeout(() => {
-        activeNotes.delete(note)
-        drawPianoPad()
-      }, 500)
-
-      // Redraw to show active state
-      drawPianoPad()
-    } else {
-      console.warn(`Audio element for ${note} not found`)
-    }
-  }
-
-  // Handle mouse/touch events
-  touchPad.addEventListener("pointerdown", (e) => {
-    e.preventDefault()
-    const rect = touchPad.getBoundingClientRect()
-    const x = (e.clientX - rect.left) * (touchPad.width / rect.width)
-    const y = (e.clientY - rect.top) * (touchPad.height / rect.height)
-
-    playNoteFromPosition(x, y)
-  })
-
-  // Handle multi-touch
-  touchPad.addEventListener("touchstart", (e) => {
-    e.preventDefault() // Prevent default behavior like scrolling
-
-    const rect = touchPad.getBoundingClientRect()
-
-    // Handle multiple touch points
-    for (let i = 0; i < e.touches.length; i++) {
-      const touch = e.touches[i]
-      const x = (touch.clientX - rect.left) * (touchPad.width / rect.width)
-      const y = (touch.clientY - rect.top) * (touchPad.height / rect.height)
-
-      playNoteFromPosition(x, y)
-    }
-  })
-
-  // Set canvas dimensions and initial draw
-  function resizeCanvas() {
-    const devicePixelRatio = window.devicePixelRatio || 1
-    const rect = touchPad.getBoundingClientRect()
-
-    touchPad.width = rect.width * devicePixelRatio
-    touchPad.height = rect.height * devicePixelRatio
-
-    ctx.scale(devicePixelRatio, devicePixelRatio)
-
-    drawPianoPad()
-  }
-
-  // Resize on load and window resize
-  resizeCanvas()
-  window.addEventListener("resize", resizeCanvas)
-}
+let savedRecordings = []
+let currentBlogPostId = null
+let audioContext = null
+let currentRecordingToDownload = null
 
 // Fix the drum key mapping to match the user's custom sounds
 function setupDrumKit() {
+  // Check if drum pads exist
+  if (!drumPads || drumPads.length === 0) {
+    console.error("No drum pad elements found")
+    return
+  }
+
   drumPads.forEach((pad) => {
     pad.addEventListener("click", function () {
       const context = initializeAudioContext()
+
+      if (context.state === 'suspended') {
+        context.resume()
+      }
 
       const note = this.getAttribute("data-note")
       const audio = document.getElementById(note)
@@ -479,15 +215,6 @@ function playRecording(recording) {
             }, 150)
           }
         }
-      } else if (note.instrument === "piano") {
-        // Try to play using audio element first
-        const audio = document.getElementById(note.note)
-        if (audio) {
-          audio.currentTime = 0
-          audio.play().catch((e) => {
-            console.error(`Error playing piano note ${note.note}:`, e)
-          })
-        }
       }
     }, note.time)
   })
@@ -539,10 +266,13 @@ function processDownloadAfterPayment(recording) {
   const a = document.createElement("a")
   a.href = url
   a.download = `${recording.instrument}_recording_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`
+  document.body.appendChild(a)
+
   a.click()
 
   // Clean up
   URL.revokeObjectURL(url)
+  document.body.removeChild(a); // Remove the temporary anchor
 
   // Show success message
   alert("Thank you for your purchase! Your download has started.")
@@ -556,10 +286,13 @@ function processWavDownloadAfterPayment(recording) {
     const a = document.createElement("a")
     a.href = url
     a.download = `${recording.instrument}_recording_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.wav`
+    document.body.appendChild(a); // Append to body to make it clickable
+
     a.click()
 
     // Clean up
     URL.revokeObjectURL(url)
+    document.body.removeChild(a); // Remove the temporary anchor
 
     // Show success message
     alert("Thank you for your purchase! Your download has started.")
@@ -682,7 +415,7 @@ function showMixingControls() {
     document.body.appendChild(mixingModal)
 
     // Add event listeners
-    document.querySelector(".close-modal").addEventListener("click", () => {
+    document.querySelector("#mixing-modal .close-modal").addEventListener("click", () => {
       mixingModal.style.display = "none"
     })
 
@@ -1007,7 +740,7 @@ async function enhancedMixTracks() {
     reverbGain.connect(offlineContext.destination)
 
     // Add special effects if enabled
-    const specialEffects = addSpecialEffectsToMix(offlineContext, offlineContext.destination, specialEffectsAmount)
+    const specialEffects = addSpecialEffectsToMix(offlineContext, masterGain, specialEffectsAmount) // Pass masterGain
 
     // Process each recording
     for (const recording of recordings) {
@@ -1062,11 +795,12 @@ async function enhancedMixTracks() {
             midEQ.connect(highEQ)
             highEQ.connect(panner)
             panner.connect(trackGain)
-            trackGain.connect(masterGain)
-
-            // Apply special effects if enabled
+            
+            // Apply special effects if enabled, connecting to trackGain
             if (specialEffectsAmount > 0) {
-              specialEffects.applyEffects(source, specialEffectsAmount)
+              specialEffects.applyEffects(source, specialEffectsAmount, trackGain); // Pass trackGain as destination
+            } else {
+              trackGain.connect(masterGain); // Connect directly to master if no special effects
             }
 
             // Set the buffer and schedule the note to play
@@ -1154,44 +888,13 @@ async function enhancedMixTracks() {
 }
 
 
-// Convert audio buffer to WAV format
 function bufferToWave(abuffer, len) {
   const numOfChan = abuffer.numberOfChannels
   const length = len * numOfChan * 2 + 44
   const buffer = new ArrayBuffer(length)
   const view = new DataView(buffer)
-  const offset = 0
   let pos = 0
 
-  // Write WAVE header
-  setUint32(0x46464952) // "RIFF"
-  setUint32(length - 8) // file length - 8
-  setUint32(0x45564157) // "WAVE"
-
-  setUint32(0x20746d66) // "fmt " chunk
-  setUint32(16) // length = 16
-  setUint16(1) // PCM (uncompressed)
-  setUint16(numOfChan)
-  setUint32(abuffer.sampleRate)
-  setUint32(abuffer.sampleRate * 2 * numOfChan) // avg. bytes/sec
-  setUint16(numOfChan * 2) // block-align
-  setUint16(16) // 16-bit
-
-  setUint32(0x61746164) // "data" chunk
-  setUint32(length - pos - 4) // chunk length
-
-  // Write interleaved data
-  for (let i = 0; i < abuffer.numberOfChannels; i++) {
-    const channel = abuffer.getChannelData(i)
-    for (let j = 0; j < len; j++) {
-      // Clamp the value to the 16-bit range
-      const sample = Math.max(-1, Math.min(1, channel[j]))
-      const value = sample < 0 ? sample * 0x8000 : sample * 0x7fff
-      setInt16(value)
-    }
-  }
-
-  // Helper functions
   function setUint16(data) {
     view.setUint16(pos, data, true)
     pos += 2
@@ -1207,786 +910,294 @@ function bufferToWave(abuffer, len) {
     pos += 2
   }
 
+  // Write WAVE header
+  setUint32(0x46464952) // "RIFF"
+  setUint32(length - 8) // file length - 8
+  setUint32(0x45564157) // "WAVE"
+  setUint32(0x20746d66) // "fmt " chunk
+  setUint32(16) // chunk length
+  setUint16(1) // PCM format
+  setUint16(numOfChan) // number of channels
+  setUint32(44100) // sample rate
+  setUint32(44100 * numOfChan * 2) // byte rate
+  setUint16(numOfChan * 2) // block align
+  setUint16(16) // bits per sample
+  setUint32(0x61746164) // "data" chunk
+  setUint32(length - pos - 4) // chunk length
+
+  // Write interleaved data
+  for (let i = 0; i < len; i++) { // Iterate over length, not channels
+    for (let channel = 0; channel < numOfChan; channel++) {
+      const sample = abuffer.getChannelData(channel)[i];
+      // Clamp the value to the 16-bit range
+      const value = Math.max(-1, Math.min(1, sample)) * 0x7FFF; // Scale to 16-bit signed integer range
+      setInt16(value);
+    }
+  }
+
   return new Blob([buffer], { type: "audio/wav" })
 }
 
-// Initialize everything when the DOM is loaded
-document.addEventListener("DOMContentLoaded", () => {
-  // Initialize audio context with a user gesture
-  document.body.addEventListener(
-    "click",
-    () => {
-      initializeAudioContext()
-    },
-    { once: true },
-  )
+// Removed fetch-based loadBlogPosts function to avoid CORS issues when opening file directly
 
-  // Setup drum kit
-  setupDrumKit()
-
-  // Setup piano pad
-  setupPianoTouchPad()
-
-  // Setup recording controls - FIXED: This is the critical part that was broken
-  const recordButtons = document.querySelectorAll(".record-btn")
-  const stopButtons = document.querySelectorAll(".stop-btn")
-
-  console.log("Found record buttons:", recordButtons.length)
-  console.log("Found stop buttons:", stopButtons.length)
-
-  // Log all record buttons for debugging
-  recordButtons.forEach((btn, index) => {
-    const instrument = btn.getAttribute("data-instrument")
-    const id = btn.id
-    console.log(`Record button ${index}: id=${id}, instrument=${instrument}`)
-  })
-
-  recordButtons.forEach((btn) => {
-    const instrument = btn.getAttribute("data-instrument")
-    if (!instrument) {
-      console.error("Record button missing data-instrument attribute:", btn)
-      return
+// Record note
+function recordNote(instrument, note, duration) {
+  if (isRecording && recordingInstrument === instrument) {
+    const noteData = {
+      instrument: instrument,
+      note: note,
+      time: Date.now() - recordingStartTime,
+      duration: duration,
+      velocity: 1.0
     }
+    recordedNotes.push(noteData)
+    console.log("Recorded note:", noteData)
+  }
+}
 
-    console.log(`Setting up record button for ${instrument}`)
+// Initialize audio context
+function initializeAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)()
+  }
+  return audioContext
+}
 
-    btn.addEventListener("click", () => {
-      console.log(`Record button clicked for ${instrument}`)
-      startRecording(instrument)
-    })
+// Initialize talking drums
+function initializeTalkingDrums() {
+  const drums = document.querySelectorAll('.talking-drum-large, .talking-drum-medium, .talking-drum-small')
+  drums.forEach(drum => {
+    drum.addEventListener('click', handleTalkingDrumClick)
   })
+}
 
-  stopButtons.forEach((btn) => {
-    const instrument = btn.getAttribute("data-instrument")
-    if (!instrument) {
-      console.error("Stop button missing data-instrument attribute:", btn)
-      return
-    }
+// Handle talking drum click
+function handleTalkingDrumClick(event) {
+  const context = initializeAudioContext()
+  if (context.state === 'suspended') {
+    context.resume()
+  }
 
-    console.log(`Setting up stop button for ${instrument}`)
+  const drum = event.target.closest('.talking-drum-large, .talking-drum-medium, .talking-drum-small')
+  if (!drum) return
 
-    btn.addEventListener("click", () => {
-      console.log(`Stop button clicked for ${instrument}`)
-      stopRecording()
+  let note
+  if (drum.classList.contains('talking-drum-large')) note = 'talking-drum-low'
+  else if (drum.classList.contains('talking-drum-medium')) note = 'talking-drum-mid'
+  else note = 'talking-drum-high'
+
+  const audio = document.getElementById(note)
+  if (audio) {
+    audio.currentTime = 0
+    audio.play().catch(e => console.error(e))
+  }
+
+  // Visual feedback
+  drum.classList.add('active')
+  setTimeout(() => drum.classList.remove('active'), 150)
+
+  // Record if recording
+  if (isRecording && recordingInstrument === 'talking-drums') {
+    recordNote('talking-drums', note, 150)
+  }
+}
+
+// Initialize navigation
+function initializeNavigation() {
+  const menuToggle = document.getElementById('mobile-menu')
+  const navMenu = document.querySelector('.nav-menu')
+
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active')
+      menuToggle.classList.toggle('active')
     })
-  })
+  }
 
-  // Setup mix all button
-  const mixAllBtn = document.getElementById("mix-all")
-  if (mixAllBtn) {
-    mixAllBtn.addEventListener("click", async () => {
-      const recordingsList = document.getElementById("recordings-list")
-      if (!recordingsList || recordingsList.children.length === 0) {
-        alert("No recordings to mix. Create some recordings first!")
-        return
+  // Smooth scrolling for navigation links
+  const navLinks = document.querySelectorAll('.nav-link')
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      const targetId = link.getAttribute('href')
+      const targetSection = document.querySelector(targetId)
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth' })
       }
-
-      // Show mixing controls modal
-      showMixingControls()
-    })
-  }
-
-  // Setup clear recordings button
-  const clearRecordingsBtn = document.getElementById("clear-recordings")
-  if (clearRecordingsBtn) {
-    clearRecordingsBtn.addEventListener("click", () => {
-      if (savedRecordings.length === 0) {
-        alert("No recordings to clear.")
-        return
-      }
-
-      if (confirm("Are you sure you want to clear all recordings?")) {
-        savedRecordings.length = 0
-        const recordingsList = document.getElementById("recordings-list")
-        const noRecordings = document.getElementById("no-recordings")
-
-        if (recordingsList && noRecordings) {
-          recordingsList.innerHTML = ""
-          recordingsList.style.display = "none"
-          noRecordings.style.display = "flex"
-        }
-      }
-    })
-  }
-
-  // Setup mobile menu toggle
-  const mobileMenu = document.getElementById("mobile-menu")
-  const navMenu = document.querySelector(".nav-menu")
-
-  if (mobileMenu && navMenu) {
-    mobileMenu.addEventListener("click", () => {
-      navMenu.classList.toggle("active")
-    })
-  }
-
-  // Setup tutorial tabs
-  const tabButtons = document.querySelectorAll(".tab-btn")
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      // Remove active class from all tabs
-      document.querySelectorAll(".tutorial-grid").forEach((grid) => {
-        grid.classList.remove("active")
-      })
-
-      // Add active class to selected tab
-      const tabId = btn.getAttribute("data-tab")
-      document.getElementById(tabId).classList.add("active")
-
-      // Update button active state
-      tabButtons.forEach((b) => b.classList.remove("active"))
-      btn.classList.add("active")
+      // Close mobile menu if open
+      navMenu.classList.remove('active')
+      menuToggle.classList.remove('active')
     })
   })
-
-  console.log("Interactive Music Studio initialized successfully!")
-})
-
-// Add these new functions for beat creation and quantization
-
-// Quantize notes to a beat grid
-function quantizeNotes(notes, bpm = 120) {
-  // Calculate time between beats in milliseconds
-  const beatTime = 60000 / bpm
-  const sixteenthNote = beatTime / 4
-
-  return notes.map((note) => {
-    // Find the closest sixteenth note grid position
-    const quantizedTime = Math.round(note.time / sixteenthNote) * sixteenthNote
-
-    return {
-      ...note,
-      time: quantizedTime,
-      quantized: true,
-    }
-  })
 }
 
-// Function to add variations (human feel) to a beat
-function addBeatVariations(beatNotes, bpm) {
-  const sixteenthNoteTime = (60000 / bpm) / 4; // Duration of a sixteenth note in ms
-
-  return beatNotes.map(note => {
-    let newTime = note.time;
-    let newVelocity = note.velocity || 1.0;
-
-    // Randomize timing slightly (swing/humanize)
-    // Shift by up to +/- 1/32nd note
-    const timingJitter = (Math.random() * 2 - 1) * (sixteenthNoteTime / 2);
-    newTime = Math.max(0, note.time + timingJitter);
-
-    // Randomize velocity slightly
-    const velocityJitter = (Math.random() * 2 - 1) * 0.1; // +/- 10%
-    newVelocity = Math.max(0.2, Math.min(1.0, newVelocity + velocityJitter));
-
-    return {
-      ...note,
-      time: newTime,
-      velocity: newVelocity
-    };
-  });
-}
-
-
-// New function to analyze recordings for beat information
-function analyzeRecordingsForBeat(recordings, bpm) {
-  // Default beat info
-  const beatInfo = {
-    hasDrums: false,
-    hasPiano: false,
-    dominantInstrument: "none",
-    density: "medium", // low, medium, high
-    duration: 0,
-    measures: 4, // Default to 4 measures
-    beatDensity: {
-      kick: 0,
-      snare: 0,
-      hihat: 0,
-    },
-  }
-
-  // Count notes by instrument type
-  let drumNoteCount = 0
-  let pianoNoteCount = 0
-  let totalNotes = 0
-  let maxTime = 0
-
-  // Analyze each recording
-  recordings.forEach((recording) => {
-    if (recording.notes.length === 0) return
-
-    // Check instrument type
-    if (recording.instrument === "drums") {
-      beatInfo.hasDrums = true
-      drumNoteCount += recording.notes.length
-
-      // Count specific drum types
-      recording.notes.forEach((note) => {
-        if (note.note === "kick") beatInfo.beatDensity.kick++
-        else if (note.note === "snare") beatInfo.beatDensity.snare++
-        else if (note.note.includes("hihat")) beatInfo.beatDensity.hihat++
-
-        // Track max time
-        maxTime = Math.max(maxTime, note.time)
-      })
-    } else if (recording.instrument === "piano") {
-      beatInfo.hasPiano = true
-      pianoNoteCount += recording.notes.length
-    }
-
-    totalNotes += recording.notes.length
-  })
-
-  // Determine dominant instrument
-  if (drumNoteCount > pianoNoteCount) {
-    beatInfo.dominantInstrument = "drums"
-  } else if (pianoNoteCount > drumNoteCount) {
-    beatInfo.dominantInstrument = "piano"
-  } else {
-    beatInfo.dominantInstrument = "balanced"
-  }
-
-  // Calculate duration in beats
-  const beatTime = 60000 / bpm // ms per beat
-  const durationInBeats = maxTime / beatTime
-
-  // Calculate measures (round up to nearest 4)
-  beatInfo.measures = Math.max(4, Math.ceil(durationInBeats / 4) * 4)
-  beatInfo.duration = beatInfo.measures * 4 * beatTime
-
-  // Determine density based on notes per beat
-  const notesPerBeat = totalNotes / durationInBeats
-  if (notesPerBeat < 1) {
-    beatInfo.density = "low"
-  } else if (notesPerBeat > 3) {
-    beatInfo.density = "high"
-  } else {
-    beatInfo.density = "medium"
-  }
-
-  return beatInfo
-}
-
-// New function to create an adaptive backing beat
-function createAdaptiveBackingBeat(beatInfo, pattern, bpm, maxDuration) {
-  const beatTime = 60000 / bpm
-  let notes = []
-
-  // If there are already drums, make the backing beat more subtle
-  const intensity = beatInfo.hasDrums ? "subtle" : "normal"
-
-  // Determine the number of measures to create
-  // Make sure we cover the entire duration of the recordings
-  const measuresToCreate = Math.max(4, Math.ceil(maxDuration / (beatTime * 4)))
-
-  // Create the appropriate pattern based on the selection
-  switch (pattern) {
-    case "basic":
-      notes = createBasicBeatPattern(beatTime, measuresToCreate, intensity)
-      break
-    case "hiphop":
-      notes = createHipHopBeatPattern(beatTime, measuresToCreate, intensity)
-      break
-    case "electronic":
-      notes = createElectronicBeatPattern(beatTime, measuresToCreate, intensity)
-      break
-    case "afrobeat":
-      notes = createAfrobeatPattern(beatTime, measuresToCreate, intensity)
-      break
-    default:
-      notes = createBasicBeatPattern(beatTime, measuresToCreate, intensity)
-  }
-
-  // If we already have drums, reduce the volume of the backing beat
-  if (beatInfo.hasDrums) {
-    notes = notes.map((note) => ({
-      ...note,
-      velocity: (note.velocity || 1) * 0.6, // Reduce velocity by 40%
-    }))
-  }
-
-  // If the dominant instrument is piano, emphasize the rhythm more
-  if (beatInfo.dominantInstrument === "piano") {
-    // Add more emphasis to the beat
-    notes = notes.map((note) => {
-      if (note.note === "kick" || note.note === "snare") {
-        return {
-          ...note,
-          velocity: (note.velocity || 1) * 1.2, // Increase velocity by 20%
-        }
-      }
-      return note
-    })
-  }
-
-  return notes
-}
-
-// Updated beat pattern functions with measures and intensity parameters
-
-// Basic beat pattern
-function createBasicBeatPattern(beatTime, measures = 4, intensity = "normal") {
-  const notes = []
-  const velocityMultiplier = intensity === "subtle" ? 0.7 : 1
-
-  // Create the specified number of measures
-  for (let measure = 0; measure < measures; measure++) {
-    const measureStart = measure * beatTime * 4
-
-    // Add kicks (beats 1 and 3)
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart + beatTime * 2,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    // Add snares (beats 2 and 4)
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime,
-      duration: 150,
-      velocity: 0.7 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime * 3,
-      duration: 150,
-      velocity: 0.7 * velocityMultiplier,
-    })
-
-    // Add hi-hats (every 8th note)
-    for (let i = 0; i < 8; i++) {
-      notes.push({
-        instrument: "drums",
-        note: "hihat-closed",
-        time: measureStart + (beatTime / 2) * i,
-        duration: 100,
-        velocity: 0.6 * velocityMultiplier,
-      })
-    }
-  }
-
-  return notes
-}
-
-// Hip-hop beat pattern
-function createHipHopBeatPattern(beatTime, measures = 4, intensity = "normal") {
-  const notes = []
-  const velocityMultiplier = intensity === "subtle" ? 0.7 : 1
-
-  // Create the specified number of measures
-  for (let measure = 0; measure < measures; measure++) {
-    const measureStart = measure * beatTime * 4
-
-    // Kicks (more syncopated)
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart,
-      duration: 150,
-      velocity: 0.9 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart + beatTime * 2.5,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    if (measure % 2 === 1) {
-      notes.push({
-        instrument: "drums",
-        note: "kick",
-        time: measureStart + beatTime * 1.5,
-        duration: 150,
-        velocity: 0.7 * velocityMultiplier,
-      })
-    }
-
-    // Snares (beats 2 and 4)
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime * 3,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    // Hi-hats (16th notes)
-    for (let i = 0; i < 16; i++) {
-      const velocity = i % 4 === 0 ? 0.7 : 0.5
-      notes.push({
-        instrument: "drums",
-        note: "hihat-closed",
-        time: measureStart + (beatTime / 4) * i,
-        duration: 80,
-        velocity: velocity * velocityMultiplier,
-      })
-    }
-
-    // Occasional crash
-    if (measure === 0 || measure % 8 === 0) {
-      notes.push({
-        instrument: "drums",
-        note: "crash",
-        time: measureStart,
-        duration: 300,
-        velocity: 0.6 * velocityMultiplier,
-      })
-    }
-  }
-
-  return notes
-}
-
-// Electronic beat pattern
-function createElectronicBeatPattern(beatTime, measures = 4, intensity = "normal") {
-  const notes = []
-  const velocityMultiplier = intensity === "subtle" ? 0.7 : 1
-
-  // Create the specified number of measures
-  for (let measure = 0; measure < measures; measure++) {
-    const measureStart = measure * beatTime * 4
-
-    // Four-on-the-floor kick pattern
-    for (let i = 0; i < 4; i++) {
-      notes.push({
-        instrument: "drums",
-        note: "kick",
-        time: measureStart + beatTime * i,
-        duration: 150,
-        velocity: 0.9 * velocityMultiplier,
-      })
-    }
-
-    // Snares or claps on 2 and 4
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime,
-      duration: 150,
-      velocity: 0.7 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime * 3,
-      duration: 150,
-      velocity: 0.7 * velocityMultiplier,
-    })
-
-    // Hi-hats (16th notes with accent pattern)
-    for (let i = 0; i < 16; i++) {
-      // Create an accent pattern
-      let velocity = 0.5
-      if (i % 4 === 0) velocity = 0.8
-      else if (i % 2 === 0) velocity = 0.6
-
-      notes.push({
-        instrument: "drums",
-        note: "hihat-closed",
-        time: measureStart + (beatTime / 4) * i,
-        duration: 60,
-        velocity: velocity * velocityMultiplier,
-      })
-    }
-
-    // Open hi-hat on offbeats
-    for (let i = 1; i < 8; i += 2) {
-      notes.push({
-        instrument: "drums",
-        note: "hihat-open",
-        time: measureStart + (beatTime / 2) * i,
-        duration: 120,
-        velocity: 0.5 * velocityMultiplier,
-      })
-    }
-  }
-
-  return notes
-}
-
-// Afrobeat pattern
-function createAfrobeatPattern(beatTime, measures = 4, intensity = "normal") {
-  const notes = []
-  const velocityMultiplier = intensity === "subtle" ? 0.7 : 1
-
-  // Create the specified number of measures
-  for (let measure = 0; measure < measures; measure++) {
-    const measureStart = measure * beatTime * 4
-
-    // Kick pattern (1, 2+, 4)
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart,
-      duration: 150,
-      velocity: 0.9 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart + beatTime * 1.5,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "kick",
-      time: measureStart + beatTime * 3,
-      duration: 150,
-      velocity: 0.85 * velocityMultiplier,
-    })
-
-    // Snare pattern (2, 4)
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    notes.push({
-      instrument: "drums",
-      note: "snare",
-      time: measureStart + beatTime * 3,
-      duration: 150,
-      velocity: 0.8 * velocityMultiplier,
-    })
-
-    // Hi-hat pattern (8th notes with accents)
-    for (let i = 0; i < 8; i++) {
-      const velocity = i % 2 === 0 ? 0.7 : 0.5
-      notes.push({
-        instrument: "drums",
-        note: "hihat-closed",
-        time: measureStart + (beatTime / 2) * i,
-        duration: 100,
-        velocity: velocity * velocityMultiplier,
-      })
-    }
-
-    // Tom fills in the last measure of each 4-measure phrase
-    if (measure % 4 === 3) {
-      notes.push({
-        instrument: "drums",
-        note: "tom1",
-        time: measureStart + beatTime * 2,
-        duration: 150,
-        velocity: 0.7 * velocityMultiplier,
-      })
-
-      notes.push({
-        instrument: "drums",
-        note: "tom1",
-        time: measureStart + beatTime * 2.5,
-        duration: 150,
-        velocity: 0.75 * velocityMultiplier,
-      })
-
-      notes.push({
-        instrument: "drums",
-        note: "tom2",
-        time: measureStart + beatTime * 2.75,
-        duration: 150,
-        velocity: 0.8 * velocityMultiplier,
-      })
-    }
-  }
-
-  return notes
-}
-
-
-// Update tempo display
-document.addEventListener("DOMContentLoaded", () => {
-  const tempoSlider = document.getElementById("tempo")
-  const tempoValue = document.getElementById("tempo-value")
-
-  if (tempoSlider && tempoValue) {
-    tempoSlider.addEventListener("input", function () {
-      tempoValue.textContent = this.value
-    })
-  }
-})
-
-// Flutterwave Payment Integration
-document.addEventListener("DOMContentLoaded", () => {
-  const flutterwavePayBtn = document.getElementById("flutterwave-pay-btn")
-  const closeModalBtns = document.querySelectorAll(".close-modal")
-
-  // Close payment modal when clicking the close button
-  closeModalBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const modal = this.closest(".modal")
-      if (modal) {
-        modal.style.display = "none"
-      }
-    })
-  })
-
-  // Close modal when clicking outside the modal content
-  window.addEventListener("click", (event) => {
-    if (event.target.classList.contains("modal")) {
-      event.target.style.display = "none"
-    }
-  })
-
-  // Handle Flutterwave payment button click
-  if (flutterwavePayBtn) {
-    flutterwavePayBtn.addEventListener("click", () => {
-      const recording = window.currentRecordingToDownload
-      if (!recording) {
-        alert("No recording selected for download")
-        return
-      }
-
-      // Initialize Flutterwave payment
-      makeFlutterwavePayment(recording)
-    })
-  }
-})
-
-// Function to make Flutterwave payment
-function makeFlutterwavePayment(recording) {
-  // Generate a unique transaction reference
-  const txRef = `DMN_${Date.now()}_${Math.floor(Math.random() * 1000000)}`
-
-  // Get recording details for payment description
-  const recordingType = recording.instrument.charAt(0).toUpperCase() + recording.instrument.slice(1)
-  const isWavFile = !!recording.audioBlob
-  const fileType = isWavFile ? "WAV" : "JSON"
-
-  // Configure FlutterwaveCheckout
-  FlutterwaveCheckout({
-    public_key: "FLWPUBK_TEST-YOUR-PUBLIC-KEY-HERE", // Replace with your Flutterwave public key
-    tx_ref: txRef,
-    amount: 5,
-    currency: "USD",
-    payment_options: "card, mobilemoney, ussd",
-    customer: {
-      email: "customer@example.com", // This would typically come from a form
-      phone_number: "", // Optional
-      name: "Customer", // Optional
-    },
-    customizations: {
-      title: "Divine Media Network",
-      description: `${recordingType} Recording (${fileType} Format)`,
-      logo: "https://your-logo-url.com/logo.png", // Replace with your logo URL
-    },
-    callback: (response) => {
-      // Handle successful payment
-      if (response.status === "successful") {
-        // Close the payment modal
-        const paymentModal = document.getElementById("payment-modal")
-        if (paymentModal) {
-          paymentModal.style.display = "none"
-        }
-
-        // Process the download based on file type
-        if (isWavFile) {
-          processWavDownloadAfterPayment(recording)
-        } else {
-          processDownloadAfterPayment(recording)
+// Load blog posts from JSON file
+function loadBlogPosts() {
+  const xhr = new XMLHttpRequest()
+  xhr.open('GET', 'blogposts.json', true)
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        try {
+          const posts = JSON.parse(xhr.responseText)
+
+          const container = document.getElementById('blog-posts-container')
+          if (!container) return
+
+          container.innerHTML = ''
+
+          posts.forEach(post => {
+            const postCard = document.createElement('div')
+            postCard.className = 'tutorial-card'
+            postCard.setAttribute('data-post-id', post.id)
+            postCard.innerHTML = `
+              <div class="tutorial-image">
+                <img src="https://img.youtube.com/vi/${getYouTubeVideoId(post.videoUrl)}/maxresdefault.jpg" alt="${post.title}" style="width:100%; height:200px; object-fit:cover; border-radius:8px;">
+                <div class="play-icon"><i class="fas fa-play"></i></div>
+                <span class="level ${post.type}">${post.type.charAt(0).toUpperCase() + post.type.slice(1)}</span>
+              </div>
+              <div class="tutorial-info">
+                <h3>${post.title}</h3>
+                <p>${post.description}</p>
+                <span class="duration"><i class="far fa-calendar"></i> ${new Date(post.createdAt).toLocaleDateString()}</span>
+              </div>
+            `
+
+            // Instead of opening modal on card click, play video on play icon click
+            const playIcon = postCard.querySelector('.play-icon')
+            if (playIcon) {
+              playIcon.addEventListener('click', (e) => {
+                e.stopPropagation()
+                const videoId = getYouTubeVideoId(post.videoUrl)
+                if (videoId) {
+                  // Replace the image with iframe to autoplay video
+                  const tutorialImage = postCard.querySelector('.tutorial-image')
+                  if (tutorialImage) {
+                    tutorialImage.innerHTML = `
+                      <iframe
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen
+                        style="width:100%; height:200px; border-radius:8px;">
+                      </iframe>
+                    `
+                  }
+                }
+              })
+            }
+            container.appendChild(postCard)
+          })
+        } catch (error) {
+          console.error('Error parsing blog posts JSON:', error)
+          const container = document.getElementById('blog-posts-container')
+          if (container) {
+            container.innerHTML = '<p>Error loading programs and videos. Please try again later.</p>'
+          }
         }
       } else {
-        alert("Payment was not successful. Please try again.")
+        console.error('Error loading blog posts:', xhr.status)
+        const container = document.getElementById('blog-posts-container')
+        if (container) {
+          container.innerHTML = '<p>Error loading programs and videos. Please try again later.</p>'
+        }
       }
-    },
-    onclose: () => {
-      // Handle when the modal is closed
-      console.log("Payment modal closed")
-    },
+    }
+  }
+  xhr.send()
+}
+
+// Get YouTube video ID from URL
+function getYouTubeVideoId(url) {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&\n?#]+)/)
+  return match ? match[1] : null
+}
+
+// Open blog post modal
+function openBlogPostModal(post) {
+  const modal = document.getElementById('blog-post-modal')
+  const title = document.getElementById('blog-post-modal-title')
+  const titleInfo = document.getElementById('blog-post-modal-title-info')
+  const description = document.getElementById('blog-post-modal-description-info')
+  const date = document.getElementById('blog-post-modal-date-info')
+  const thumbnail = document.getElementById('blog-post-modal-thumbnail')
+  const iframe = document.getElementById('blog-post-video-iframe')
+  const playIcon = document.querySelector('#blog-post-modal .play-icon')
+
+  if (modal && title && titleInfo && description && date && thumbnail && iframe) {
+    title.textContent = post.title
+    titleInfo.textContent = post.title
+    description.textContent = post.description
+    date.innerHTML = `<i class="far fa-calendar"></i> ${new Date(post.createdAt).toLocaleDateString()}`
+
+    const videoId = getYouTubeVideoId(post.videoUrl)
+    thumbnail.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`
+
+    modal.setAttribute('data-current-post-id', post.id)
+    modal.style.display = 'block'
+
+    // Show iframe immediately and hide thumbnail and play icon
+    thumbnail.style.display = 'none'
+    iframe.style.display = 'block'
+    if (playIcon) playIcon.style.display = 'none'
+
+    // Load comments
+    loadComments(post.id)
+  }
+}
+
+// Load comments for a post
+function loadComments(postId) {
+  const commentsList = document.getElementById('comments-list')
+  if (!commentsList) return
+
+  const comments = JSON.parse(localStorage.getItem(`comments_${postId}`)) || []
+  commentsList.innerHTML = ''
+
+  comments.forEach(comment => {
+    const commentDiv = document.createElement('div')
+    commentDiv.className = 'comment'
+    commentDiv.innerHTML = `
+      <div class="comment-content">
+        <p>${comment.text}</p>
+        <small>${new Date(comment.timestamp).toLocaleString()}</small>
+      </div>
+    `
+    commentsList.appendChild(commentDiv)
   })
 }
 
-// Add these functions to enhance the mix beat functionality
+// Post a comment
+function postComment(postId) {
+  const commentInput = document.getElementById('comment-input')
+  if (!commentInput || !commentInput.value.trim()) return
 
-// Function to add special effects to the mix
-function addSpecialEffectsToMix(offlineContext, masterGain, specialEffectsAmount) {
-  // Create a distortion effect
-  const distortion = offlineContext.createWaveShaper()
-  function makeDistortionCurve(amount) {
-    const k = typeof amount === "number" ? amount : 50
-    const n_samples = 44100
-    const curve = new Float32Array(n_samples)
-    const deg = Math.PI / 180
+  const comments = JSON.parse(localStorage.getItem(`comments_${postId}`)) || []
+  comments.push({
+    text: commentInput.value.trim(),
+    timestamp: new Date().toISOString()
+  })
 
-    for (let i = 0; i < n_samples; ++i) {
-      const x = (i * 2) / n_samples - 1
-      curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x))
-    }
-    return curve
-  }
-  distortion.curve = makeDistortionCurve(50 * specialEffectsAmount) // Scale distortion by amount
-  distortion.oversample = "4x"
-
-  // Create a delay effect
-  const delay = offlineContext.createDelay(5.0)
-  delay.delayTime.value = 0.3 * specialEffectsAmount // Scale delay time by amount
-
-  // Create a feedback for the delay
-  const feedback = offlineContext.createGain()
-  feedback.gain.value = 0.4 * specialEffectsAmount // Scale feedback by amount
-
-  // Create a filter for the delay feedback
-  const filter = offlineContext.createBiquadFilter()
-  filter.frequency.value = 1000 + (specialEffectsAmount * 2000); // Scale filter frequency
-  filter.Q.value = 1 + (specialEffectsAmount * 5); // Scale filter Q
-
-  // Connect the effects
-  delay.connect(feedback)
-  feedback.connect(filter)
-  filter.connect(delay)
-
-  return {
-    distortion,
-    delay,
-    filter,
-    applyEffects: (source, amount) => {
-      if (amount > 0) {
-        // Create a gain node to control the amount of effect
-        const effectGain = offlineContext.createGain()
-        effectGain.gain.value = amount // Use the passed amount directly
-
-        // Connect the source to the effects chain
-        source.connect(distortion)
-        distortion.connect(effectGain)
-        effectGain.connect(masterGain) // Connect to master gain
-
-        // Connect the source to the delay
-        source.connect(delay)
-        delay.connect(effectGain)
-      }
-    },
-  }
+  localStorage.setItem(`comments_${postId}`, JSON.stringify(comments))
+  commentInput.value = ''
+  loadComments(postId)
 }
 
-// Initialize FlutterwaveCheckout (ensure it's available before use)
-const FlutterwaveCheckout = window.FlutterwaveCheckout
+// Close blog post modal
+function closeBlogPostModal() {
+  const modal = document.getElementById('blog-post-modal')
+  const iframe = document.getElementById('blog-post-video-iframe')
+  const thumbnail = document.getElementById('blog-post-modal-thumbnail')
+  const playIcon = document.querySelector('#blog-post-modal .play-icon')
+
+  if (modal) {
+    modal.style.display = 'none'
+    if (iframe) {
+      iframe.src = ''
+      iframe.style.display = 'none'
+    }
+    if (thumbnail) thumbnail.style.display = 'block'
+    if (playIcon) playIcon.style.display = 'flex'
+  }
+}

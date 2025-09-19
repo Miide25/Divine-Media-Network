@@ -149,6 +149,13 @@
     </div>
   </div>
 
+  <!-- Export and Import Buttons -->
+  <div style="margin: 1rem 0; max-width: 7xl; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem;">
+    <button id="export-posts-btn" class="btn btn-primary">Export Posts</button>
+    <input type="file" id="import-posts-file" accept=".json" style="display:none" />
+    <button id="import-posts-btn" class="btn btn-secondary">Import Posts</button>
+  </div>
+
   <script>
     let posts = [];
     let editingPostId = null;
@@ -333,6 +340,57 @@
       localStorage.removeItem("adminLoggedIn");
       localStorage.removeItem("userType");
       window.location.href = "index.html";
+    });
+
+    // Export posts from localStorage as JSON file
+    function exportPosts() {
+      const posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+      if (posts.length === 0) {
+        alert('No posts to export.');
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(posts, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "blogPosts.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      alert('Posts exported as blogPosts.json. Upload this file to your server.');
+    }
+
+    // Import posts JSON file and save to localStorage
+    function importPosts(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedPosts = JSON.parse(e.target.result);
+          if (Array.isArray(importedPosts)) {
+            localStorage.setItem('blogPosts', JSON.stringify(importedPosts));
+            alert('Blog posts imported successfully!');
+            renderPosts(); // Refresh posts list UI
+          } else {
+            alert('Invalid blog posts file format.');
+          }
+        } catch {
+          alert('Error parsing blog posts file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Event listeners for export/import buttons
+    document.getElementById('export-posts-btn').addEventListener('click', exportPosts);
+
+    document.getElementById('import-posts-btn').addEventListener('click', () => {
+      document.getElementById('import-posts-file').click();
+    });
+
+    document.getElementById('import-posts-file').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        importPosts(file);
+      }
     });
 
     // Initialize

@@ -97,8 +97,10 @@
       <div id="login-error-message" class="mt-4 text-center text-red-600 font-medium hidden">
         Invalid username or password
       </div>
-
-    
+      <div id="login-success-message" class="mt-4 text-center text-green-600 font-medium hidden">
+        Account created successfully! Please log in.
+      </div>
+    </div>
 
     <!-- Signup Form -->
     <div id="signup-form" class="tab-content">
@@ -209,9 +211,6 @@
       </form>
 
       <div id="signup-error-message" class="mt-4 text-center text-red-600 font-medium hidden"></div>
-      <div id="signup-success-message" class="mt-4 text-center text-green-600 font-medium hidden">
-        Account created successfully!
-      </div>
     </div>
 
     <button
@@ -230,6 +229,7 @@
     const signupForm = document.getElementById('signup-form');
     const formTitle = document.getElementById('form-title');
     const formSubtitle = document.getElementById('form-subtitle');
+    const loginSuccessMessage = document.getElementById('login-success-message');
 
     loginTab.addEventListener('click', () => {
       loginForm.classList.add('active');
@@ -238,8 +238,10 @@
       loginTab.classList.remove('bg-gray-200', 'text-gray-700');
       signupTab.classList.remove('bg-purple-600', 'text-white');
       signupTab.classList.add('bg-gray-200', 'text-gray-700');
-      formTitle.textContent = 'User  Login';
+      formTitle.textContent = 'User Login';
       formSubtitle.textContent = 'Access your account';
+      // Hide signup success message if it was shown
+      loginSuccessMessage.classList.add('hidden');
     });
 
     signupTab.addEventListener('click', () => {
@@ -251,6 +253,8 @@
       loginTab.classList.add('bg-gray-200', 'text-gray-700');
       formTitle.textContent = 'Create Account';
       formSubtitle.textContent = 'Join Divine Media Network';
+      // Hide login success message if it was shown
+      loginSuccessMessage.classList.add('hidden');
     });
 
     // Password visibility toggles
@@ -288,6 +292,7 @@
 
       const loginText = document.getElementById('login-text');
       const errorMessage = document.getElementById('login-error-message');
+      loginSuccessMessage.classList.add('hidden'); // Hide success message on new login attempt
 
       loginText.textContent = 'Logging in...';
 
@@ -295,7 +300,7 @@
         if (username === adminCredentials.username && password === adminCredentials.password) {
           localStorage.setItem('adminLoggedIn', 'true');
           localStorage.setItem('userType', 'admin');
-          localStorage.removeItem('normalUser ');
+          localStorage.removeItem('normalUser');
           window.location.href = 'admin.html';
           return;
         }
@@ -304,7 +309,7 @@
         const user = users.find(u => u.username === username && u.password === password);
 
         if (user) {
-          localStorage.setItem('normalUser ', JSON.stringify(user));
+          localStorage.setItem('normalUser', JSON.stringify(user));
           localStorage.removeItem('adminLoggedIn');
           localStorage.setItem('userType', 'user');
           window.location.href = 'main.html';
@@ -330,7 +335,7 @@
 
       const signupText = document.getElementById('signup-text');
       const errorMessage = document.getElementById('signup-error-message');
-      const successMessage = document.getElementById('signup-success-message');
+      errorMessage.classList.add('hidden'); // Hide previous error message
 
       if (!name || !username || !email || !password || !confirmPassword) {
         errorMessage.textContent = 'Please fill in all fields';
@@ -361,19 +366,23 @@
         registeredAt: new Date().toISOString()
       };
 
-      users.push(newUser );
+      users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
-      localStorage.setItem('normalUser ', JSON.stringify(newUser ));
-      localStorage.setItem('userType', 'user');
 
       signupText.textContent = 'Creating...';
       errorMessage.classList.add('hidden');
 
       setTimeout(() => {
-        successMessage.classList.remove('hidden');
+        // Reset signup form
+        document.getElementById('signup-form-element').reset();
+        signupText.textContent = 'Create Account';
+
+        // Switch to login tab and show success message
+        loginTab.click();
+        loginSuccessMessage.classList.remove('hidden');
         setTimeout(() => {
-          window.location.href = 'main.html';
-        }, 1500);
+            loginSuccessMessage.classList.add('hidden');
+        }, 5000); // Hide success message after 5 seconds
       }, 1000);
     });
   </script>
