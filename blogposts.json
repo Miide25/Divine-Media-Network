@@ -9,13 +9,15 @@
   }, 
   
   {
-    "id": 1758330026452,
-    "title": "E maa y'ase ",
-    "description": "E maa y'ase: "https://youtu.be/lPE3rZNcJdQ?si=VweHElvqooC5q0xm",
+     "id": 1758330026452,
+    "title": "E maa y'ase",
+    "description": "E maa y'ase",
+    "videoUrl": "https://youtu.be/lPE3rZNcJdQ?si=VweHElvqooC5q0xm",
     "type": "program",
     "createdAt": "2025-09-20T01:00:26.452Z"
   }
 ]
+
 
 
 
